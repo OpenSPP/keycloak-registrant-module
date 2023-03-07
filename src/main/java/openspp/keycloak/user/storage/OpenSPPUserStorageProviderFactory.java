@@ -1,8 +1,8 @@
 package openspp.keycloak.user.storage;
 
-import com.google.auto.service.AutoService;
-
-import lombok.extern.slf4j.Slf4j;
+import java.util.HashMap;
+import java.util.List;
+import java.util.Map;
 
 import org.keycloak.Config;
 import org.keycloak.component.ComponentModel;
@@ -13,9 +13,9 @@ import org.keycloak.provider.ProviderConfigProperty;
 import org.keycloak.provider.ProviderConfigurationBuilder;
 import org.keycloak.storage.UserStorageProviderFactory;
 
-import java.util.HashMap;
-import java.util.List;
-import java.util.Map;
+import com.google.auto.service.AutoService;
+
+import lombok.extern.slf4j.Slf4j;
 
 @Slf4j
 @AutoService(UserStorageProviderFactory.class)
@@ -23,11 +23,10 @@ public class OpenSPPUserStorageProviderFactory implements UserStorageProviderFac
 
     public static final String id = "openspp";
     private static final String PARAMETER_PLACEHOLDER_HELP = " Use '?' as parameter placeholder character (replaced only once). ";
-    private static final String DEFAULT_HELP_TEXT = "Select to query all users you must return at least: \"id\". " +
-            "            \"username\"," +
+    private static final String DEFAULT_HELP_TEXT = "Select to query all view_oidc you must return at least: \"id\". " +
+            "            \"login\"," +
             "            \"email\" (optional)," +
-            "            \"firstName\" (optional)," +
-            "            \"lastName\" (optional). Any other parameter can be mapped by aliases to a realm scope.";
+            "            \"name\" (optional). Any other parameter can be mapped by aliases to a realm scope.";
     private static final String PARAMETER_HELP = " The %s is passed as query parameter.";
 
     private Map<String, ProviderConfig> providerConfigPerInstance = new HashMap<>();
@@ -57,7 +56,7 @@ public class OpenSPPUserStorageProviderFactory implements UserStorageProviderFac
         String user = model.get("user");
         String password = model.get("password");
         String url = model.get("url");
-        JDBC jdbc = JDBC.getByDescription(model.get("jdbc"));
+        JDBC jdbc = JDBC.getByDescription(JDBC.POSTGRESQL.getDesc());
         providerConfig.dataSourceProvider.configure(url, jdbc, user, password, model.getName());
         providerConfig.queryConfigurations = new QueryConfigurations(
                 model.get("count"),
@@ -66,8 +65,8 @@ public class OpenSPPUserStorageProviderFactory implements UserStorageProviderFac
                 model.get("findByUsername"),
                 model.get("findBySearchTerm"),
                 model.get("findPasswordHash"),
-                model.get("hashingAlgorithm"),
-                jdbc);
+                jdbc
+        );
         return providerConfig;
     }
 
@@ -100,7 +99,7 @@ public class OpenSPPUserStorageProviderFactory implements UserStorageProviderFac
                 .label("JDBC URL")
                 .helpText("JDBC Connection String")
                 .type(ProviderConfigProperty.STRING_TYPE)
-                .defaultValue("jdbc:postgresql://server-name:server-port/database_name")
+                .defaultValue("jdbc:postgresql://172.17.0.1:15432/devel")
                 .add();
 
         pcBuilder.property()
@@ -108,7 +107,7 @@ public class OpenSPPUserStorageProviderFactory implements UserStorageProviderFac
                 .label("JDBC Connection User")
                 .helpText("JDBC Connection User")
                 .type(ProviderConfigProperty.STRING_TYPE)
-                .defaultValue("user")
+                .defaultValue("odoo")
                 .add();
 
         pcBuilder.property()
@@ -116,16 +115,7 @@ public class OpenSPPUserStorageProviderFactory implements UserStorageProviderFac
                 .label("JDBC Connection Password")
                 .helpText("JDBC Connection Password")
                 .type(ProviderConfigProperty.PASSWORD)
-                .defaultValue("password")
-                .add();
-
-        pcBuilder.property()
-                .name("jdbc")
-                .label("JDBC")
-                .helpText("Relational Database Management System")
-                .type(ProviderConfigProperty.LIST_TYPE)
-                .options(JDBC.getAllDescriptions())
-                .defaultValue(JDBC.POSTGRESQL.getDesc())
+                .defaultValue("odoopassword")
                 .add();
 
         // Queries
@@ -133,9 +123,9 @@ public class OpenSPPUserStorageProviderFactory implements UserStorageProviderFac
         pcBuilder.property()
                 .name("count")
                 .label("User count SQL query")
-                .helpText("SQL query returning the total count of users")
+                .helpText("SQL query returning the total count of view_oidc")
                 .type(ProviderConfigProperty.STRING_TYPE)
-                .defaultValue("SELECT COUNT(*) FROM users")
+                .defaultValue("SELECT COUNT(*) FROM view_oidc")
                 .add();
 
         pcBuilder.property()
@@ -143,7 +133,7 @@ public class OpenSPPUserStorageProviderFactory implements UserStorageProviderFac
                 .label("List All Users SQL query")
                 .helpText(DEFAULT_HELP_TEXT)
                 .type(ProviderConfigProperty.STRING_TYPE)
-                .defaultValue("SELECT \"id\", \"username\", \"email\", \"firstName\", \"lastName\" FROM users")
+                .defaultValue("SELECT id, login AS username, email, name AS first_name FROM view_oidc")
                 .add();
 
         pcBuilder.property()
@@ -153,18 +143,18 @@ public class OpenSPPUserStorageProviderFactory implements UserStorageProviderFac
                         + PARAMETER_PLACEHOLDER_HELP)
                 .type(ProviderConfigProperty.STRING_TYPE)
                 .defaultValue(
-                        "SELECT \"id\", \"username\", \"email\", \"firstName\", \"lastName\" FROM users WHERE \"id\" = ? ")
+                        "SELECT id, login AS username, email, name AS first_name FROM view_oidc WHERE \"id\" = ? ")
                 .add();
 
         pcBuilder.property()
                 .name("findByUsername")
-                .label("Find user by username SQL query")
+                .label("Find user by login SQL query")
                 .helpText(
-                        DEFAULT_HELP_TEXT + String.format(PARAMETER_HELP, "user username")
+                        DEFAULT_HELP_TEXT + String.format(PARAMETER_HELP, "user login")
                                 + PARAMETER_PLACEHOLDER_HELP)
                 .type(ProviderConfigProperty.STRING_TYPE)
                 .defaultValue(
-                        "SELECT \"id\", \"username\", \"email\", \"firstName\", \"lastName\" FROM users WHERE \"username\" = ? ")
+                        "SELECT id, login AS username, email, name AS first_name FROM view_oidc WHERE \"login\" = ? ")
                 .add();
 
         pcBuilder.property()
@@ -174,30 +164,17 @@ public class OpenSPPUserStorageProviderFactory implements UserStorageProviderFac
                         + PARAMETER_PLACEHOLDER_HELP)
                 .type(ProviderConfigProperty.STRING_TYPE)
                 .defaultValue(
-                        "SELECT \"id\", \"username\", \"email\", \"firstName\", \"lastName\" FROM users WHERE \"username\" ILIKE (?) or \"email\" ILIKE (?) or \"firstName\" ILIKE (?) or \"lastName\" ILIKE (?)")
+                        "SELECT id, login AS username, email, name AS first_name FROM view_oidc WHERE \"login\" ILIKE (?) or \"email\" ILIKE (?) or \"name\" ILIKE (?)")
                 .add();
 
         pcBuilder.property()
                 .name("findPasswordHash")
-                .label("Find password hash (blowfish or hash digest hex) SQL query")
+                .label("Find password hash PBKDF2 SQL query")
                 .helpText(
-                        DEFAULT_HELP_TEXT + String.format(PARAMETER_HELP, "user username")
+                        DEFAULT_HELP_TEXT + String.format(PARAMETER_HELP, "user login")
                                 + PARAMETER_PLACEHOLDER_HELP)
                 .type(ProviderConfigProperty.STRING_TYPE)
-                .defaultValue("SELECT password FROM users WHERE \"username\" = ? ")
-                .add();
-
-        // Password hashing algorithms
-        pcBuilder.property()
-                .name("hashingAlgorithm")
-                .label("Password hashing algorithm")
-                .helpText("Hash type used to match password (md* or sha* uses hex hash digest)")
-                .type(ProviderConfigProperty.LIST_TYPE)
-                .options("Blowfish (bcrypt)", "MD2", "MD5", "SHA-1", "SHA-256", "SHA3-224", "SHA3-256",
-                        "SHA3-384",
-                        "SHA3-512", "SHA-384", "SHA-512/224", "SHA-512/256", "SHA-512",
-                        "PBKDF2-SHA256", "INSECURE PLAINTEXT")
-                .defaultValue("SHA-1")
+                .defaultValue("SELECT password FROM view_oidc WHERE \"login\" = ? ")
                 .add();
 
         return pcBuilder.build();

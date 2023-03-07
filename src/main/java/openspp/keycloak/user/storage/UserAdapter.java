@@ -1,6 +1,11 @@
 package openspp.keycloak.user.storage;
 
-import lombok.extern.slf4j.Slf4j;
+import java.util.HashSet;
+import java.util.Map;
+import java.util.Map.Entry;
+import java.util.Objects;
+import java.util.Set;
+import java.util.stream.Collectors;
 
 import org.apache.commons.lang3.StringUtils;
 import org.keycloak.component.ComponentModel;
@@ -9,12 +14,7 @@ import org.keycloak.models.RealmModel;
 import org.keycloak.storage.StorageId;
 import org.keycloak.storage.adapter.AbstractUserAdapterFederatedStorage;
 
-import java.util.HashSet;
-import java.util.Map;
-import java.util.Map.Entry;
-import java.util.Objects;
-import java.util.Set;
-import java.util.stream.Collectors;
+import lombok.extern.slf4j.Slf4j;
 
 @Slf4j
 public class UserAdapter extends AbstractUserAdapterFederatedStorage {
@@ -45,6 +45,22 @@ public class UserAdapter extends AbstractUserAdapterFederatedStorage {
     @Override
     public String getUsername() {
         return username;
+    }
+
+    public String getFirstName() {
+        return getFirstAttribute("first_name");
+    }
+
+    public String getLastName() {
+        return getFirstAttribute("last_name");
+    }
+
+    public String getFullName() {
+        String fullName = getFirstAttribute("full_name");
+        if (fullName == null) {
+            fullName = getFirstName() + " " + getLastName();
+        }
+        return fullName;
     }
 
     @Override

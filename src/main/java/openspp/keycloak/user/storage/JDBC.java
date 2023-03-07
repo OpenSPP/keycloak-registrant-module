@@ -1,11 +1,11 @@
 package openspp.keycloak.user.storage;
 
-import org.hibernate.dialect.Dialect;
-import org.hibernate.dialect.PostgreSQL10Dialect;
-
 import java.util.Arrays;
 import java.util.List;
 import java.util.stream.Collectors;
+
+import org.hibernate.dialect.Dialect;
+import org.hibernate.dialect.PostgreSQL10Dialect;
 
 public enum JDBC {
 

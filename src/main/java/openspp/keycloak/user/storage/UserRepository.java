@@ -1,24 +1,28 @@
 package openspp.keycloak.user.storage;
 
-import org.apache.commons.codec.binary.Hex;
-import org.apache.commons.codec.binary.StringUtils;
-import org.apache.commons.codec.digest.DigestUtils;
-import org.apache.commons.lang3.NotImplementedException;
-import org.mindrot.jbcrypt.BCrypt;
-
-import lombok.extern.slf4j.Slf4j;
-import openspp.keycloak.user.storage.util.PBKDF2SHA256HashingUtil;
-import openspp.keycloak.user.storage.util.Paginator;
-import openspp.keycloak.user.storage.util.Paginator.Pageable;
-
-import javax.sql.DataSource;
-import java.security.MessageDigest;
 import java.sql.Connection;
 import java.sql.PreparedStatement;
 import java.sql.ResultSet;
 import java.sql.SQLException;
-import java.util.*;
+import java.util.ArrayList;
+import java.util.Arrays;
+import java.util.Collections;
+import java.util.HashMap;
+import java.util.HashSet;
+import java.util.List;
+import java.util.Map;
+import java.util.Optional;
+import java.util.Set;
 import java.util.function.Function;
+
+import javax.sql.DataSource;
+
+import org.apache.commons.lang3.NotImplementedException;
+
+import lombok.extern.slf4j.Slf4j;
+import openspp.keycloak.user.storage.util.PBKDF2HashingUtil;
+import openspp.keycloak.user.storage.util.Paginator;
+import openspp.keycloak.user.storage.util.Paginator.Pageable;
 
 @Slf4j
 public class UserRepository {
@@ -41,7 +45,7 @@ public class UserRepository {
             DataSource dataSource = dataSourceOpt.get();
             try (Connection c = dataSource.getConnection()) {
                 if (pageable != null) {
-                    query = Paginator.getPagableQuery(query, pageable, queryConfigurations.getJDBCDriver());
+                    query = Paginator.getPagableQuery(query, pageable, queryConfigurations.getJDBC());
                 }
                 log.info("Query: {} params: {} ", query, Arrays.toString(params));
                 try (PreparedStatement statement = c.prepareStatement(query)) {
@@ -153,27 +157,11 @@ public class UserRepository {
         return doQuery(queryConfigurations.getFindBySearchTerm(), pageable, this::readMap, search);
     }
 
-    public boolean validateCredentials(String username, String password) {
+    public boolean validateCredentials(String username, String password) throws Exception {
         String hash = Optional
                 .ofNullable(doQuery(queryConfigurations.getFindPasswordHash(), this::readString, username))
                 .orElse("");
-        if (queryConfigurations.isPlainText()) {
-            return Objects.equals(password, hash);
-        } else if (queryConfigurations.isBlowfish()) {
-            return !hash.isEmpty() && BCrypt.checkpw(password, hash);
-        } else {
-            String hashFunction = queryConfigurations.getHashingAlgorithm();
-
-            if (queryConfigurations.isPBKDF2SHA256()) {
-                String[] components = hash.split("\\$");
-                return new PBKDF2SHA256HashingUtil(password, components[2], Integer.valueOf(components[1]))
-                        .validatePassword(components[3]);
-            }
-
-            MessageDigest digest = DigestUtils.getDigest(hashFunction);
-            byte[] pwdBytes = StringUtils.getBytesUtf8(password);
-            return Objects.equals(Hex.encodeHexString(digest.digest(pwdBytes)), hash);
-        }
+        return PBKDF2HashingUtil.validatePassword(password, hash);
     }
 
     public boolean updateCredentials(String username, String password) {

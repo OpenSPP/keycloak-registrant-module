@@ -1,0 +1,35 @@
+<odoo>    
+    <!-- change oidc password wizard -->
+    <record id="change_oidc_password_wizard_view" model="ir.ui.view">
+        <field name="name">Change OIDC Password</field>
+        <field name="model">change.oidc.password.wizard</field>
+        <field name="arch" type="xml">
+            <form string="Change OIDC Password">
+                <field mode="tree" name="user_ids"/>
+                <footer>
+                    <button string="Change OIDC Password" name="change_oidc_password_button" type="object" class="btn-primary" data-hotkey="q"/>
+                    <button string="Cancel" class="btn-secondary" special="cancel" data-hotkey="z" />
+                </footer>
+            </form>
+        </field>
+    </record>
+    <record id="change_oidc_password_wizard_user_tree_view" model="ir.ui.view">
+        <field name="name">Change OIDC Password Users</field>
+        <field name="model">change.oidc.password.user</field>
+        <field name="arch" type="xml">
+            <!-- the user list is editable, but one cannot add or delete rows -->
+            <tree string="Users" editable="bottom" create="false" delete="false">
+                <field name="user_id" invisible="1"/>
+                <field name="user_login"/>
+                <field name="new_passwd" required="True" password="True"/>
+            </tree>
+        </field>
+    </record>
+    <record id="change_oidc_password_wizard_action" model="ir.actions.act_window">
+        <field name="name">Change OIDC Password</field>
+        <field name="res_model">change.oidc.password.wizard</field>
+        <field name="view_mode">form</field>
+        <field name="target">new</field>
+        <field name="binding_model_id" ref="base.model_res_users"/>
+    </record>
+</odoo>
