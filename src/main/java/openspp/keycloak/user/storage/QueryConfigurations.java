@@ -9,18 +9,23 @@ public class QueryConfigurations {
     private String listAll;
     private String findById;
     private String findByUsername;
+    private String findByPDSForm;
     private String findBySearchTerm;
     private String findPasswordHash;
+    private String findPasswordHashAlt;
     private JDBC JDBC;
 
     public QueryConfigurations(String count, String listAll, String findById, String findByUsername,
-            String findBySearchTerm, String findPasswordHash, JDBC jdbc) {
+            String findByPDSForm, String findBySearchTerm, String findPasswordHash, String findPasswordHashAlt,
+            JDBC jdbc) {
         this.count = count;
         this.listAll = listAll;
         this.findById = findById;
         this.findByUsername = findByUsername;
+        this.findByPDSForm = findByPDSForm;
         this.findBySearchTerm = findBySearchTerm;
         this.findPasswordHash = findPasswordHash;
+        this.findPasswordHashAlt = findPasswordHashAlt;
         this.JDBC = jdbc;
     }
 }

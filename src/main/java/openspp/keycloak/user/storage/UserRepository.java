@@ -18,8 +18,10 @@ import java.util.function.Function;
 import javax.sql.DataSource;
 
 import org.apache.commons.lang3.NotImplementedException;
+import org.keycloak.models.KeycloakSession;
 
 import lombok.extern.slf4j.Slf4j;
+import openspp.keycloak.user.auth.pds.PDSAuthenticatorForm;
 import openspp.keycloak.user.storage.util.PBKDF2HashingUtil;
 import openspp.keycloak.user.storage.util.Paginator;
 import openspp.keycloak.user.storage.util.Paginator.Pageable;
@@ -29,10 +31,12 @@ public class UserRepository {
 
     private DataSourceProvider dataSourceProvider;
     private QueryConfigurations queryConfigurations;
+    private final KeycloakSession session;
 
-    public UserRepository(DataSourceProvider dataSourceProvider, QueryConfigurations queryConfigurations) {
+    public UserRepository(KeycloakSession session, DataSourceProvider dataSourceProvider, QueryConfigurations queryConfigurations) {
         this.dataSourceProvider = dataSourceProvider;
         this.queryConfigurations = queryConfigurations;
+        this.session = session;
     }
 
     private <T> T doQuery(String query, Function<ResultSet, T> resultTransformer, Object... params) {
@@ -150,6 +154,10 @@ public class UserRepository {
                 .stream().findFirst();
     }
 
+    public List<Map<String, String>> findUsersByPDSForm(String pdsNumber, String uidNumber, String phoneNumber, String familyNumber) {
+        return doQuery(queryConfigurations.getFindByPDSForm(), this::readMap, pdsNumber, uidNumber, phoneNumber, familyNumber);
+    }
+
     public List<Map<String, String>> findUsers(String search, Paginator.Pageable pageable) {
         if (search == null || search.isEmpty() || search.equals("*")) {
             return doQuery(queryConfigurations.getListAll(), pageable, this::readMap);
@@ -158,8 +166,18 @@ public class UserRepository {
     }
 
     public boolean validateCredentials(String username, String password) throws Exception {
+        String param = username;
+        String query = queryConfigurations.getFindPasswordHash();
+        String uid = session.getContext().getAuthenticationSession().getAuthNote(PDSAuthenticatorForm.FIELD_UID);
+
+        // Use Unified ID number in the findPasswordHashAlt query if we are using PDS authenticator.
+        if (uid != null && !uid.isEmpty()) {
+            param = uid;
+            query = queryConfigurations.getFindPasswordHashAlt();
+        }
+        
         String hash = Optional
-                .ofNullable(doQuery(queryConfigurations.getFindPasswordHash(), this::readString, username))
+                .ofNullable(doQuery(query, this::readString, param))
                 .orElse("");
         return PBKDF2HashingUtil.validatePassword(password, hash);
     }

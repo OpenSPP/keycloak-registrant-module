@@ -29,7 +29,7 @@ public class PBKDF2HashingUtil {
         }
         String hmac = hashAttrs[1].split("-")[1].toUpperCase();
         int iterations = Integer.parseInt(hashAttrs[2]);
-        byte[] salt = Base64.getDecoder().decode(hashAttrs[3]);
+        byte[] salt = Base64.getDecoder().decode(hashAttrs[3].replace(".", "+"));
         int keyLength = 512;
         String computedHash = "";
         SecretKeyFactory skf = SecretKeyFactory.getInstance("PBKDF2WithHmac" + hmac);
@@ -43,8 +43,6 @@ public class PBKDF2HashingUtil {
         computedHash = Base64.getEncoder().encodeToString(secretKey.getEncoded());
         computedHash = computedHash.replace("+", ".");
         computedHash = computedHash.replaceAll("=+$", "");
-        log.info(String.format("Original hash: %s", hash));
-        log.info(String.format("Computed hash: %s", computedHash));
         return hashAttrs[4].equals(computedHash);
     }
 }

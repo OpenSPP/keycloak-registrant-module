@@ -23,8 +23,9 @@ public class OpenSPPUserStorageProviderFactory implements UserStorageProviderFac
 
     public static final String id = "openspp";
     private static final String PARAMETER_PLACEHOLDER_HELP = " Use '?' as parameter placeholder character (replaced only once). ";
-    private static final String DEFAULT_HELP_TEXT = "Select to query all view_oidc you must return at least: \"id\". " +
-            "            \"login\"," +
+    private static final String DEFAULT_HELP_TEXT = "Select to query all view_oidc you must return at least: \"id\". "
+            +
+            "            \"username\"," +
             "            \"email\" (optional)," +
             "            \"name\" (optional). Any other parameter can be mapped by aliases to a realm scope.";
     private static final String PARAMETER_HELP = " The %s is passed as query parameter.";
@@ -63,10 +64,11 @@ public class OpenSPPUserStorageProviderFactory implements UserStorageProviderFac
                 model.get("listAll"),
                 model.get("findById"),
                 model.get("findByUsername"),
+                model.get("findByPDSForm"),
                 model.get("findBySearchTerm"),
                 model.get("findPasswordHash"),
-                jdbc
-        );
+                model.get("findPasswordHashAlt"),
+                jdbc);
         return providerConfig;
     }
 
@@ -133,7 +135,7 @@ public class OpenSPPUserStorageProviderFactory implements UserStorageProviderFac
                 .label("List All Users SQL query")
                 .helpText(DEFAULT_HELP_TEXT)
                 .type(ProviderConfigProperty.STRING_TYPE)
-                .defaultValue("SELECT id, login AS username, email, name AS first_name FROM view_oidc")
+                .defaultValue("SELECT id, username, email, phone, first_name FROM view_oidc")
                 .add();
 
         pcBuilder.property()
@@ -143,18 +145,29 @@ public class OpenSPPUserStorageProviderFactory implements UserStorageProviderFac
                         + PARAMETER_PLACEHOLDER_HELP)
                 .type(ProviderConfigProperty.STRING_TYPE)
                 .defaultValue(
-                        "SELECT id, login AS username, email, name AS first_name FROM view_oidc WHERE \"id\" = ? ")
+                        "SELECT id, username, email, phone, first_name FROM view_oidc WHERE \"id\" = ? ")
                 .add();
 
         pcBuilder.property()
                 .name("findByUsername")
-                .label("Find user by login SQL query")
+                .label("Find user by username SQL query")
                 .helpText(
-                        DEFAULT_HELP_TEXT + String.format(PARAMETER_HELP, "user login")
+                        DEFAULT_HELP_TEXT + String.format(PARAMETER_HELP, "user username")
                                 + PARAMETER_PLACEHOLDER_HELP)
                 .type(ProviderConfigProperty.STRING_TYPE)
                 .defaultValue(
-                        "SELECT id, login AS username, email, name AS first_name FROM view_oidc WHERE \"login\" = ? ")
+                        "SELECT id, username, email, phone, first_name FROM view_oidc WHERE \"username\" = ? ")
+                .add();
+
+        pcBuilder.property()
+                .name("findByPDSForm")
+                .label("Find user by PDS form SQL query")
+                .helpText(
+                        DEFAULT_HELP_TEXT + String.format(PARAMETER_HELP, "PDS, UID, Family numbers")
+                                + PARAMETER_PLACEHOLDER_HELP)
+                .type(ProviderConfigProperty.STRING_TYPE)
+                .defaultValue(
+                        "SELECT id, username, email, phone, first_name, is_group, kind_name, type_name, type_value FROM view_oidc WHERE (\"type_name\" = 'PDS' AND \"type_value\" = ?) OR (\"type_name\" = 'Unified ID' AND \"type_value\" = ? AND \"phone\" = ?) OR \"username\" = ? ")
                 .add();
 
         pcBuilder.property()
@@ -164,17 +177,27 @@ public class OpenSPPUserStorageProviderFactory implements UserStorageProviderFac
                         + PARAMETER_PLACEHOLDER_HELP)
                 .type(ProviderConfigProperty.STRING_TYPE)
                 .defaultValue(
-                        "SELECT id, login AS username, email, name AS first_name FROM view_oidc WHERE \"login\" ILIKE (?) or \"email\" ILIKE (?) or \"name\" ILIKE (?)")
+                        "SELECT id, username, email, phone, first_name FROM view_oidc WHERE \"username\" ILIKE (?) or \"email\" ILIKE (?) or \"first_name\" ILIKE (?)")
                 .add();
 
         pcBuilder.property()
                 .name("findPasswordHash")
                 .label("Find password hash PBKDF2 SQL query")
                 .helpText(
-                        DEFAULT_HELP_TEXT + String.format(PARAMETER_HELP, "user login")
+                        DEFAULT_HELP_TEXT + String.format(PARAMETER_HELP, "user username")
                                 + PARAMETER_PLACEHOLDER_HELP)
                 .type(ProviderConfigProperty.STRING_TYPE)
-                .defaultValue("SELECT password FROM view_oidc WHERE \"login\" = ? ")
+                .defaultValue("SELECT password FROM view_oidc WHERE \"username\" = ? ")
+                .add();
+
+        pcBuilder.property()
+                .name("findPasswordHashAlt")
+                .label("Find password hash PBKDF2 SQL alt query")
+                .helpText(
+                        DEFAULT_HELP_TEXT + String.format(PARAMETER_HELP, "user alternative attribute")
+                                + PARAMETER_PLACEHOLDER_HELP)
+                .type(ProviderConfigProperty.STRING_TYPE)
+                .defaultValue("SELECT password FROM view_oidc WHERE \"type_value\" = ? ")
                 .add();
 
         return pcBuilder.build();

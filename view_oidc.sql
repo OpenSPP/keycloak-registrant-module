@@ -1,14 +1,17 @@
 DROP VIEW IF EXISTS view_oidc;
 CREATE VIEW view_oidc AS
   SELECT
-    u.id,
-    login,
-    password,
-    p.oidc_password,
-    p.name,
-    p.display_name,
-    p.id AS partner_id,
+    p.id,
+    p.oidc_password AS password,
+    p.name AS username,
+    p.display_name AS first_name,
+    p.parent_id,
+    ggk.id AS kind_id,
+    ggk.name AS kind_name,
+    git.name AS type_name,
+    gri.value AS type_value,
     p.company_id,
+    p.is_group,
     p.title,
     p.lang,
     p.tz,
@@ -16,5 +19,12 @@ CREATE VIEW view_oidc AS
     p.email,
     p.phone
   FROM
-  res_users u
-  INNER JOIN res_partner p ON u.partner_id = p.id;
+    res_partner p
+    LEFT JOIN g2p_group_kind ggk ON ggk.id = p.kind
+    LEFT JOIN g2p_reg_id gri ON gri.partner_id = p.id
+    LEFT JOIN g2p_id_type git ON git.id = gri.id_type
+  WHERE
+    p.is_company = false
+    AND p.is_registrant = true
+  ORDER BY id
+;

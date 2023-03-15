@@ -1,1 +1,2 @@
 openspp.keycloak.user.auth.email.otp.EmailAuthenticatorFormFactory
+openspp.keycloak.user.auth.sms.otp.SmsAuthenticatorFactory

@@ -1,5 +1,6 @@
 package openspp.keycloak.user.storage;
 
+import java.util.Hashtable;
 import java.util.List;
 import java.util.Map;
 import java.util.Set;
@@ -24,6 +25,7 @@ import org.keycloak.storage.user.UserQueryProvider;
 import org.keycloak.storage.user.UserRegistrationProvider;
 
 import lombok.extern.slf4j.Slf4j;
+import openspp.keycloak.user.auth.pds.PDSAuthenticatorForm;
 import openspp.keycloak.user.storage.util.Paginator;
 
 @Slf4j
@@ -39,7 +41,7 @@ public class OpenSPPUserStorageProvider implements UserStorageProvider,
             QueryConfigurations queryConfigurations) {
         this.session = session;
         this.model = model;
-        this.repository = new UserRepository(dataSourceProvider, queryConfigurations);
+        this.repository = new UserRepository(session, dataSourceProvider, queryConfigurations);
     }
 
     private Stream<UserModel> toUserModelStream(RealmModel realm, List<Map<String, String>> users) {
@@ -79,9 +81,7 @@ public class OpenSPPUserStorageProvider implements UserStorageProvider,
                 return false;
             }
 
-            // For now, we'll just invalidate the cache if username or email has changed.
-            // Eventually we could check all (or a parametered list of) attributes fetched
-            // from the DB.
+            // TODO: Check all (or a parametered list of) attributes fetched from the DB.
             if (!java.util.Objects.equals(user.getUsername(), dbUser.getUsername())
                     || !java.util.Objects.equals(user.getEmail(), dbUser.getEmail())) {
                 ((CachedUserModel) user).invalidate();
@@ -90,7 +90,6 @@ public class OpenSPPUserStorageProvider implements UserStorageProvider,
         try {
             return repository.validateCredentials(dbUser.getUsername(), cred.getChallengeResponse());
         } catch (Exception e) {
-            // TODO Auto-generated catch block
             e.printStackTrace();
         }
         return false;
@@ -152,7 +151,50 @@ public class OpenSPPUserStorageProvider implements UserStorageProvider,
     public UserModel getUserByUsername(RealmModel realm, String username) {
         log.info("lookup user by username: realm={} username={}", realm.getId(), username);
 
-        return repository.findUserByUsername(username).map(u -> new UserAdapter(session, realm, model, u)).orElse(null);
+        String pdsNumber = session.getContext().getAuthenticationSession().getAuthNote(PDSAuthenticatorForm.FIELD_PDS);
+        String uidNumber = session.getContext().getAuthenticationSession().getAuthNote(PDSAuthenticatorForm.FIELD_UID);
+        String familyNumber = session.getContext().getAuthenticationSession().getAuthNote(PDSAuthenticatorForm.FIELD_FAMILY_NUMBER);
+        String phoneNumber = session.getContext().getAuthenticationSession().getAuthNote(PDSAuthenticatorForm.FIELD_PHONE_NUMBER);
+
+        if (pdsNumber != null && uidNumber != null
+            && familyNumber != null && phoneNumber != null) {
+
+            log.info(">>>>>>>>>>>>>>>> Input data: PDS={} UID={} Phone={} Family={}", pdsNumber, uidNumber, phoneNumber, familyNumber);
+    
+            Stream<UserModel> users = toUserModelStream(realm, repository.findUsersByPDSForm(pdsNumber, uidNumber, phoneNumber, familyNumber));
+    
+            Hashtable<String, UserModel> foundUsers = new Hashtable<>();
+    
+            users.forEach(u -> {
+                final UserAdapter ua = (UserAdapter)u;
+                if (ua.isGroup()) {
+                    if (ua.getTypeName().equals("PDS")
+                        && ua.getTypeValue().equals(pdsNumber)
+                        && u.getFirstName().equals(familyNumber)) {
+                        log.info("Found family user: {}", u.getUsername());
+                        foundUsers.put("family", u);
+                    } else {
+                        log.warn("User {} is a group but PDS or Family number is not correct", u.getUsername());
+                    }
+                } else {
+                    if (ua.getTypeName().equals("Unified ID")
+                        && ua.getTypeValue().equals(uidNumber)
+                        && ua.getPhoneNumber().equals(phoneNumber)) {
+                        log.info("Found member user: {}", u.getUsername());
+                        foundUsers.put("member", u);
+                    } else {
+                        log.warn("User {} is individual but Unified ID is not correct", u.getUsername());
+                    }
+                }
+            });
+    
+            if (foundUsers.containsKey("family") && foundUsers.containsKey("member")) {
+                return foundUsers.get("member");
+            }
+            return null;
+        } else {
+            return repository.findUserByUsername(username).map(u -> new UserAdapter(session, realm, model, u)).orElse(null);
+        }
     }
 
     @Override
@@ -238,5 +280,11 @@ public class OpenSPPUserStorageProvider implements UserStorageProvider,
     @Override
     public Stream<UserModel> searchForUserByUserAttributeStream(RealmModel realm, String attrName, String attrValue) {
         return Stream.empty();
+    }
+
+    public Stream<UserModel> getPDSUser(RealmModel realm, String pdsNumber, String uidNumber, String phoneNumber, String familyNumber) {
+        log.info("lookup user by id: realm={} PDS={} UID={} Phone={} Family={}", realm.getId(), pdsNumber, uidNumber, phoneNumber, familyNumber);
+
+        return toUserModelStream(realm, repository.findUsersByPDSForm(pdsNumber, uidNumber, phoneNumber, familyNumber));
     }
 }

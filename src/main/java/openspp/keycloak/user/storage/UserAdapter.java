@@ -63,6 +63,26 @@ public class UserAdapter extends AbstractUserAdapterFederatedStorage {
         return fullName;
     }
 
+    public String getPhoneNumber() {
+        return getFirstAttribute("phone");
+    }
+
+    public String getTypeName() {
+        return getFirstAttribute("type_name");
+    }
+
+    public String getTypeValue() {
+        return getFirstAttribute("type_value");
+    }
+
+    public String getKindName() {
+        return getFirstAttribute("kind_name");
+    }
+
+    public boolean isGroup() {
+        return getFirstAttribute("is_group").equals("t");
+    }
+
     @Override
     public void setUsername(String username) {
         this.username = username;

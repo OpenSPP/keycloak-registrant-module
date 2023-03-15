@@ -2,14 +2,14 @@
 import logging
 import textwrap
 
-from odoo import _, api, fields, models
+from odoo import _, fields, models
+from odoo.exceptions import UserError
 
 _logger = logging.getLogger(__name__)
 
 
-class OIDCPartner(models.Model):
+class ResPartnerOIDC(models.Model):
     _name = 'res.partner'
     _inherit = 'res.partner'
-    _description = 'OIDC Partner'
 
     oidc_password = fields.Char(string='OIDC password', required=False)

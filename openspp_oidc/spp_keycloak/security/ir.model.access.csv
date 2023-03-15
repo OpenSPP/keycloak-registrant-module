@@ -1,0 +1,3 @@
+id,name,model_id:id,group_id:id,perm_read,perm_write,perm_create,perm_unlink
+spp_partner_oidc,SPP Partner OIDC Admin Access,spp_keycloak.model_spp_change_oidc_password,,1,1,1,1
+spp_partner_oidc_wizard,SPP Partner OIDC Admin Access,spp_keycloak.model_spp_change_oidc_password_wizard,,1,1,1,1
