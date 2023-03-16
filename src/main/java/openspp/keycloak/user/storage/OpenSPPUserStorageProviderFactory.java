@@ -135,7 +135,7 @@ public class OpenSPPUserStorageProviderFactory implements UserStorageProviderFac
                 .label("List All Users SQL query")
                 .helpText(DEFAULT_HELP_TEXT)
                 .type(ProviderConfigProperty.STRING_TYPE)
-                .defaultValue("SELECT id, username, email, phone, first_name FROM view_oidc")
+                .defaultValue("SELECT id, id AS partner_id, username, email, phone, first_name FROM view_oidc")
                 .add();
 
         pcBuilder.property()
@@ -145,7 +145,7 @@ public class OpenSPPUserStorageProviderFactory implements UserStorageProviderFac
                         + PARAMETER_PLACEHOLDER_HELP)
                 .type(ProviderConfigProperty.STRING_TYPE)
                 .defaultValue(
-                        "SELECT id, username, email, phone, first_name FROM view_oidc WHERE \"id\" = ? ")
+                        "SELECT id, id AS partner_id, username, email, phone, first_name FROM view_oidc WHERE \"id\" = ? ")
                 .add();
 
         pcBuilder.property()
@@ -156,7 +156,7 @@ public class OpenSPPUserStorageProviderFactory implements UserStorageProviderFac
                                 + PARAMETER_PLACEHOLDER_HELP)
                 .type(ProviderConfigProperty.STRING_TYPE)
                 .defaultValue(
-                        "SELECT id, username, email, phone, first_name FROM view_oidc WHERE \"username\" = ? ")
+                        "SELECT id, id AS partner_id, username, email, phone, first_name FROM view_oidc WHERE \"username\" = ? ")
                 .add();
 
         pcBuilder.property()
@@ -167,7 +167,7 @@ public class OpenSPPUserStorageProviderFactory implements UserStorageProviderFac
                                 + PARAMETER_PLACEHOLDER_HELP)
                 .type(ProviderConfigProperty.STRING_TYPE)
                 .defaultValue(
-                        "SELECT id, username, email, phone, first_name, is_group, kind_name, type_name, type_value FROM view_oidc WHERE (\"type_name\" = 'PDS' AND \"type_value\" = ?) OR (\"type_name\" = 'Unified ID' AND \"type_value\" = ? AND \"phone\" = ?) OR \"username\" = ? ")
+                        "SELECT id, id AS partner_id, username, email, phone, first_name, is_group, kind_name, type_name, type_value FROM view_oidc WHERE (\"type_name\" = 'PDS' AND \"type_value\" = ?) OR (\"type_name\" = 'Unified ID' AND \"type_value\" = ? AND \"phone\" = ?) OR \"username\" = ? ")
                 .add();
 
         pcBuilder.property()
@@ -177,7 +177,7 @@ public class OpenSPPUserStorageProviderFactory implements UserStorageProviderFac
                         + PARAMETER_PLACEHOLDER_HELP)
                 .type(ProviderConfigProperty.STRING_TYPE)
                 .defaultValue(
-                        "SELECT id, username, email, phone, first_name FROM view_oidc WHERE \"username\" ILIKE (?) or \"email\" ILIKE (?) or \"first_name\" ILIKE (?)")
+                        "SELECT id, id AS partner_id, username, email, phone, first_name FROM view_oidc WHERE \"username\" ILIKE (?) or \"email\" ILIKE (?) or \"first_name\" ILIKE (?)")
                 .add();
 
         pcBuilder.property()

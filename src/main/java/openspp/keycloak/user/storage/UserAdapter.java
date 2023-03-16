@@ -42,6 +42,10 @@ public class UserAdapter extends AbstractUserAdapterFederatedStorage {
         return keycloakId;
     }
 
+    public String getPartnerId() {
+        return getFirstAttribute("partner_id");
+    }
+
     @Override
     public String getUsername() {
         return username;
