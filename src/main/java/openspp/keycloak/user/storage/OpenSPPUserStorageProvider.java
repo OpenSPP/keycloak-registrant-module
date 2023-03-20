@@ -161,7 +161,7 @@ public class OpenSPPUserStorageProvider implements UserStorageProvider,
 
             log.info(">>>>>>>>>>>>>>>> Input data: PDS={} UID={} Phone={} Family={}", pdsNumber, uidNumber, phoneNumber, familyNumber);
     
-            Stream<UserModel> users = toUserModelStream(realm, repository.findUsersByPDSForm(pdsNumber, uidNumber, phoneNumber, familyNumber));
+            Stream<UserModel> users = toUserModelStream(realm, repository.findUsersByPDSForm(pdsNumber, familyNumber, uidNumber, phoneNumber));
     
             Hashtable<String, UserModel> foundUsers = new Hashtable<>();
     
@@ -283,8 +283,8 @@ public class OpenSPPUserStorageProvider implements UserStorageProvider,
     }
 
     public Stream<UserModel> getPDSUser(RealmModel realm, String pdsNumber, String uidNumber, String phoneNumber, String familyNumber) {
-        log.info("lookup user by id: realm={} PDS={} UID={} Phone={} Family={}", realm.getId(), pdsNumber, uidNumber, phoneNumber, familyNumber);
+        log.info("lookup user by id: realm={} PDS={} UID={} Phone={} Family={}", realm.getId(), pdsNumber, familyNumber, uidNumber, phoneNumber);
 
-        return toUserModelStream(realm, repository.findUsersByPDSForm(pdsNumber, uidNumber, phoneNumber, familyNumber));
+        return toUserModelStream(realm, repository.findUsersByPDSForm(pdsNumber, familyNumber, uidNumber, phoneNumber));
     }
 }

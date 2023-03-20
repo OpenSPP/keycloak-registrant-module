@@ -119,11 +119,11 @@ public class UserAdapter extends AbstractUserAdapterFederatedStorage {
     }
 
     public String getTypeName() {
-        return getFirstAttribute("type_name");
+        return getFirstAttribute("id_type_name");
     }
 
     public String getTypeValue() {
-        return getFirstAttribute("type_value");
+        return getFirstAttribute("id_type_value");
     }
 
     public String getKindName() {

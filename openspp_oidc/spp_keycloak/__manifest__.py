@@ -18,9 +18,9 @@
         "g2p_registry_individual",
         "g2p_registry_group",
         "g2p_registry_membership",
+        "base_rest_auth_user_service",
     ],
-    "external_dependencies": {
-    },
+    "external_dependencies": {"python": ["extendable-pydantic", "pydantic"]},
     "data": [
         "security/ir.model.access.csv",
         "views/change_oidc_password_wizard.xml",

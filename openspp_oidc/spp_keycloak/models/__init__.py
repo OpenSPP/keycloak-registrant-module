@@ -3,3 +3,4 @@
 
 from . import res_partner
 from . import change_oidc_password
+from . import pds

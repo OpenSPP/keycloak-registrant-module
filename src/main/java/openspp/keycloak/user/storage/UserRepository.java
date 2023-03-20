@@ -154,8 +154,8 @@ public class UserRepository {
                 .stream().findFirst();
     }
 
-    public List<Map<String, String>> findUsersByPDSForm(String pdsNumber, String uidNumber, String phoneNumber, String familyNumber) {
-        return doQuery(queryConfigurations.getFindByPDSForm(), this::readMap, pdsNumber, uidNumber, phoneNumber, familyNumber);
+    public List<Map<String, String>> findUsersByPDSForm(String pdsNumber, String familyNumber, String uidNumber, String phoneNumber) {
+        return doQuery(queryConfigurations.getFindByPDSForm(), this::readMap, pdsNumber, familyNumber, uidNumber, phoneNumber);
     }
 
     public List<Map<String, String>> findUsers(String search, Paginator.Pageable pageable) {
