@@ -1,6 +1,9 @@
 package openspp.keycloak.user.storage;
 
+import java.util.ArrayList;
 import java.util.HashSet;
+import java.util.Hashtable;
+import java.util.List;
 import java.util.Map;
 import java.util.Map.Entry;
 import java.util.Objects;
@@ -21,6 +24,7 @@ public class UserAdapter extends AbstractUserAdapterFederatedStorage {
 
     private final String keycloakId;
     private String username;
+    private List<String> nameParts;
 
     public UserAdapter(KeycloakSession session, RealmModel realm, ComponentModel model, Map<String, String> data) {
         super(session, realm, model);
@@ -51,12 +55,55 @@ public class UserAdapter extends AbstractUserAdapterFederatedStorage {
         return username;
     }
 
+    /**
+     * Parse first name and last name from full name format using by Odoo.
+     * 
+     * @return List<String>
+     */
+    private List<String> getNameParts() {
+        if (nameParts != null) {
+            return nameParts;
+        }
+        nameParts = new ArrayList<>();
+        String fullName = getFirstAttribute("full_name");
+        if (fullName != null) {
+            String token = null;
+            if (fullName.contains(",")) {
+                token = ",";
+            } else if (fullName.contains(" ")) {
+                token = " ";
+            }
+
+            if (token != null) {
+                nameParts.add(fullName.substring(0, fullName.lastIndexOf(token)).trim());
+                nameParts.add(fullName.substring(fullName.lastIndexOf(token)).replace(token, "").trim());
+            } else {
+                nameParts.add(fullName);
+            }
+        }
+        return nameParts;
+    }
+
     public String getFirstName() {
-        return getFirstAttribute("first_name");
+        String firstName = getFirstAttribute("first_name");
+        if (firstName == null || firstName.isEmpty()) {
+            List<String> nameParts = getNameParts();
+            if (nameParts.size() > 0) {
+                return nameParts.get(0);
+            }
+        }
+        return null;
     }
 
     public String getLastName() {
-        return getFirstAttribute("last_name");
+        String lastName = getFirstAttribute("last_name");
+        if (lastName == null || lastName.isEmpty()) {
+            List<String> nameParts = getNameParts();
+            if (nameParts.size() > 1) {
+                return nameParts.get(1);
+            }
+        }
+        return null;
     }
 
     public String getFullName() {

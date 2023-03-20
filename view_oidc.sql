@@ -2,9 +2,10 @@ DROP VIEW IF EXISTS view_oidc;
 CREATE VIEW view_oidc AS
   SELECT
     p.id,
-    p.oidc_password AS password,
     p.name AS username,
-    p.display_name AS first_name,
+    p.display_name AS full_name,
+    '' AS first_name,
+    '' AS last_name,
     p.parent_id,
     ggk.id AS kind_id,
     ggk.name AS kind_name,
@@ -17,7 +18,8 @@ CREATE VIEW view_oidc AS
     p.tz,
     p.active,
     p.email,
-    p.phone
+    p.phone,
+    p.oidc_password AS password
   FROM
     res_partner p
     LEFT JOIN g2p_group_kind ggk ON ggk.id = p.kind
