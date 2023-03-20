@@ -23,7 +23,6 @@
     "external_dependencies": {"python": ["extendable-pydantic", "pydantic"]},
     "data": [
         "security/ir.model.access.csv",
-        "views/change_oidc_password_wizard.xml",
     ],
     "assets": {},
     "demo": [],
