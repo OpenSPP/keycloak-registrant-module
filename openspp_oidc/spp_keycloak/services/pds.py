@@ -4,6 +4,7 @@ import json
 from odoo.addons.base_rest import restapi
 from odoo.addons.base_rest_pydantic.restapi import PydanticModel
 from odoo.addons.component.core import Component
+from odoo.addons.phone_validation.tools import phone_validation
 from passlib.context import CryptContext
 
 from ..models.pds import (
@@ -13,6 +14,9 @@ from ..models.pds import (
     PDSUpdatePaswordIn,
     PDSUpdatePasswordOut,
 )
+
+
+_logger = logging.getLogger(__name__)
 
 
 class PDSApiService(Component):

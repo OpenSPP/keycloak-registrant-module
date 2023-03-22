@@ -19,6 +19,10 @@ import org.keycloak.models.utils.FormMessage;
 import org.keycloak.services.ServicesLogger;
 import org.keycloak.services.messages.Messages;
 
+import com.google.i18n.phonenumbers.PhoneNumberUtil;
+import com.google.i18n.phonenumbers.PhoneNumberUtil.PhoneNumberFormat;
+import com.google.i18n.phonenumbers.Phonenumber.PhoneNumber;
+
 import lombok.extern.slf4j.Slf4j;
 
 @Slf4j
@@ -44,6 +48,7 @@ public class PDSAuthenticatorForm implements Authenticator {
     };
 
     private final KeycloakSession session;
+    private final PhoneNumberUtil phoneNumberUtil = PhoneNumberUtil.getInstance();
 
     public PDSAuthenticatorForm(KeycloakSession session) {
         this.session = session;
@@ -77,6 +82,23 @@ public class PDSAuthenticatorForm implements Authenticator {
             String familyNumber = formData.getFirst(FIELD_FAMILY_NUMBER);
             String phoneNumber = formData.getFirst(FIELD_PHONE_NUMBER);
             String password = formData.getFirst(FIELD_PASSWORD);
+
+            boolean isPhoneNumberValid = false;
+            try {
+                PhoneNumber iPNumber = phoneNumberUtil.parse(formData.getFirst(FIELD_PHONE_NUMBER), null);
+                if (phoneNumberUtil.isValidNumber(iPNumber)) {
+                    phoneNumber = phoneNumberUtil.format(iPNumber, PhoneNumberFormat.INTERNATIONAL);
+                    isPhoneNumberValid = true;
+                }
+            } catch (Exception e) {
+                isPhoneNumberValid = false;
+            }
+
+            if (!isPhoneNumberValid) {
+                Response challengeResponse = challenge(context, "invalidPhoneNumberMessage", FIELD_PHONE_NUMBER);
+                context.forceChallenge(challengeResponse);
+                return false;
+            }
 
             context.getAuthenticationSession().setAuthNote(FIELD_PDS, pdsNumber);
             context.getAuthenticationSession().setAuthNote(FIELD_UID, uidNumber);

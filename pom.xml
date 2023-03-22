@@ -15,6 +15,7 @@
         <keycloak.version>20.0.3</keycloak.version>
         <junit.version>5.9.2</junit.version>
         <auto-service.version>1.0.1</auto-service.version>
+        <libphonenumber.version>8.13.8</libphonenumber.version>
         <restassured.version>5.3.0</restassured.version>
         <resteasy.version>6.2.2.Final</resteasy.version>
         <slf4j.version>2.0.6</slf4j.version>
@@ -130,6 +131,11 @@
             <version>21.0</version>
         </dependency>
 
+        <dependency>
+            <groupId>com.googlecode.libphonenumber</groupId>
+            <artifactId>libphonenumber</artifactId>
+            <version>${libphonenumber.version}</version>
+        </dependency>
         <dependency>
             <groupId>com.google.auto.service</groupId>
             <artifactId>auto-service</artifactId>
