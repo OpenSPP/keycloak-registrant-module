@@ -1,2 +1,2 @@
 id,name,model_id:id,group_id:id,perm_read,perm_write,perm_create,perm_unlink
-spp_partner_oidc,SPP Partner OIDC Access,spp_keycloak.model_spp_partner_oidc,,1,1,1,1
+spp_partner_oidc_registrar,OIDC Feature Access,spp_keycloak.model_spp_partner_oidc,g2p_registry_base.group_g2p_registrar,1,1,1,1
