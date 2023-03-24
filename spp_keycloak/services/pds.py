@@ -32,7 +32,7 @@ class PDSApiService(Component):
         [(["/phone"], "POST")],
         input_param=PydanticModel(PDSUpdatePhoneIn),
         output_param=PydanticModel(PDSUpdatePhoneOut),
-        auth="jwt",
+        auth="jwt_tamwini",
     )
     def changePhoneNumber(self, info: PDSUpdatePhoneIn):
         """
@@ -83,7 +83,7 @@ class PDSApiService(Component):
         [(["/password"], "POST")],
         input_param=PydanticModel(PDSUpdatePaswordIn),
         output_param=PydanticModel(PDSUpdatePasswordOut),
-        auth="jwt",
+        auth="jwt_tamwini",
     )
     def changePassword(self, info: PDSUpdatePaswordIn):
         """
