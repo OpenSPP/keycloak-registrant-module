@@ -27,21 +27,17 @@ import lombok.extern.slf4j.Slf4j;
 
 @Slf4j
 public class PDSAuthenticatorForm implements Authenticator {
-
-    static final String ID = "pds-authenticator-form";
     static final String TEMPLATE = "pds-authenticator-form.ftl";
 
-    public static final String FIELD_PDS = "pds";
     public static final String FIELD_UID = "uid";
-    public static final String FIELD_FAMILY_NUMBER = "family_number";
+    public static final String FIELD_HOUSEHOLD_NUMBER = "household_number";
     public static final String FIELD_PHONE_NUMBER = "phone_number";
     public static final String FIELD_OTP = "otp";
     public static final String FIELD_PASSWORD = "password";
 
     public static final String[] FIELDS = {
-        FIELD_PDS,
         FIELD_UID,
-        FIELD_FAMILY_NUMBER,
+        FIELD_HOUSEHOLD_NUMBER,
         FIELD_PHONE_NUMBER,
         FIELD_OTP,
         FIELD_PASSWORD,
@@ -74,12 +70,13 @@ public class PDSAuthenticatorForm implements Authenticator {
     }
 
     protected boolean validateForm(AuthenticationFlowContext context, MultivaluedMap<String, String> formData) {
-        if (formData.containsKey(FIELD_PDS) && formData.containsKey(FIELD_UID)
-                && formData.containsKey(FIELD_FAMILY_NUMBER) && formData.containsKey(FIELD_PHONE_NUMBER)) {
+        if (formData.containsKey(FIELD_UID)
+                && formData.containsKey(FIELD_HOUSEHOLD_NUMBER)
+                && formData.containsKey(FIELD_PHONE_NUMBER)
+            ) {
 
-            String pdsNumber = formData.getFirst(FIELD_PDS);
             String uidNumber = formData.getFirst(FIELD_UID);
-            String familyNumber = formData.getFirst(FIELD_FAMILY_NUMBER);
+            String householdNumber = formData.getFirst(FIELD_HOUSEHOLD_NUMBER);
             String phoneNumber = formData.getFirst(FIELD_PHONE_NUMBER);
             String password = formData.getFirst(FIELD_PASSWORD);
 
@@ -100,15 +97,14 @@ public class PDSAuthenticatorForm implements Authenticator {
                 return false;
             }
 
-            context.getAuthenticationSession().setAuthNote(FIELD_PDS, pdsNumber);
             context.getAuthenticationSession().setAuthNote(FIELD_UID, uidNumber);
-            context.getAuthenticationSession().setAuthNote(FIELD_FAMILY_NUMBER, familyNumber);
+            context.getAuthenticationSession().setAuthNote(FIELD_HOUSEHOLD_NUMBER, householdNumber);
             context.getAuthenticationSession().setAuthNote(FIELD_PHONE_NUMBER, phoneNumber);
             context.getAuthenticationSession().setAuthNote(FIELD_PASSWORD, password);
 
             UserModel user = null;
             try {
-                user = context.getSession().users().getUserByUsername(context.getRealm(), familyNumber);
+                user = context.getSession().users().getUserByUsername(context.getRealm(), householdNumber);
                 
                 if (user == null) {
                     log.info("User not found.");
@@ -175,9 +171,6 @@ public class PDSAuthenticatorForm implements Authenticator {
             }
         }
 
-        log.debug("vvvvvvv");
-        log.debug(StringUtils.join(", ", formData));
-        log.debug("^^^^^^^");
         if (!formData.isEmpty()) {
             form.setFormData(formData);
         }

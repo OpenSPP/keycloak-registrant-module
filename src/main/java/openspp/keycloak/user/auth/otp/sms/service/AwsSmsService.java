@@ -1,4 +1,4 @@
-package openspp.keycloak.user.auth.sms.otp.service;
+package openspp.keycloak.user.auth.otp.sms.service;
 
 import software.amazon.awssdk.services.sns.SnsClient;
 import software.amazon.awssdk.services.sns.model.MessageAttributeValue;

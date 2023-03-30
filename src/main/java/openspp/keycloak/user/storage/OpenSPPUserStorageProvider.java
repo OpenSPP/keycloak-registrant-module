@@ -151,30 +151,29 @@ public class OpenSPPUserStorageProvider implements UserStorageProvider,
     public UserModel getUserByUsername(RealmModel realm, String username) {
         log.info("lookup user by username: realm={} username={}", realm.getId(), username);
 
-        String pdsNumber = session.getContext().getAuthenticationSession().getAuthNote(PDSAuthenticatorForm.FIELD_PDS);
         String uidNumber = session.getContext().getAuthenticationSession().getAuthNote(PDSAuthenticatorForm.FIELD_UID);
-        String familyNumber = session.getContext().getAuthenticationSession().getAuthNote(PDSAuthenticatorForm.FIELD_FAMILY_NUMBER);
+        String householdNumber = session.getContext().getAuthenticationSession().getAuthNote(PDSAuthenticatorForm.FIELD_HOUSEHOLD_NUMBER);
         String phoneNumber = session.getContext().getAuthenticationSession().getAuthNote(PDSAuthenticatorForm.FIELD_PHONE_NUMBER);
 
-        if (pdsNumber != null && uidNumber != null
-            && familyNumber != null && phoneNumber != null) {
+        if (uidNumber != null
+            && householdNumber != null
+            && phoneNumber != null
+        ) {
 
-            log.info(">>>>>>>>>>>>>>>> Input data: PDS={} UID={} Phone={} Family={}", pdsNumber, uidNumber, phoneNumber, familyNumber);
+            log.info(">>>>>>>>>>>>>>>> Input data: UID={} Phone={} Household={}", uidNumber, phoneNumber, householdNumber);
     
-            Stream<UserModel> users = toUserModelStream(realm, repository.findUsersByPDSForm(pdsNumber, familyNumber, uidNumber, phoneNumber));
+            Stream<UserModel> users = toUserModelStream(realm, repository.findUsersByPDSForm(householdNumber, uidNumber, phoneNumber));
     
             Hashtable<String, UserModel> foundUsers = new Hashtable<>();
     
             users.forEach(u -> {
                 final UserAdapter ua = (UserAdapter)u;
                 if (ua.isGroup()) {
-                    if (ua.getTypeName().equals("PDS")
-                        && ua.getTypeValue().equals(pdsNumber)
-                        && u.getFirstName().equals(familyNumber)) {
-                        log.info("Found family user: {}", u.getUsername());
-                        foundUsers.put("family", u);
+                    if (u.getFirstName().equals(householdNumber)) {
+                        log.info("Found household user: {}", u.getUsername());
+                        foundUsers.put("household", u);
                     } else {
-                        log.warn("User {} is a group but PDS or Family number is not correct", u.getUsername());
+                        log.warn("User {} is a group but Household number is not correct", u.getUsername());
                     }
                 } else {
                     if (ua.getTypeName().equals("Unified ID")
@@ -188,7 +187,7 @@ public class OpenSPPUserStorageProvider implements UserStorageProvider,
                 }
             });
     
-            if (foundUsers.containsKey("family") && foundUsers.containsKey("member")) {
+            if (foundUsers.containsKey("household") && foundUsers.containsKey("member")) {
                 return foundUsers.get("member");
             }
             return null;
@@ -282,9 +281,9 @@ public class OpenSPPUserStorageProvider implements UserStorageProvider,
         return Stream.empty();
     }
 
-    public Stream<UserModel> getPDSUser(RealmModel realm, String pdsNumber, String uidNumber, String phoneNumber, String familyNumber) {
-        log.info("lookup user by id: realm={} PDS={} UID={} Phone={} Family={}", realm.getId(), pdsNumber, familyNumber, uidNumber, phoneNumber);
+    public Stream<UserModel> getPDSUser(RealmModel realm, String uidNumber, String phoneNumber, String householdNumber) {
+        log.info("lookup user by id: realm={} UID={} Phone={} Household={}", realm.getId(), householdNumber, uidNumber, phoneNumber);
 
-        return toUserModelStream(realm, repository.findUsersByPDSForm(pdsNumber, familyNumber, uidNumber, phoneNumber));
+        return toUserModelStream(realm, repository.findUsersByPDSForm(householdNumber, uidNumber, phoneNumber));
     }
 }

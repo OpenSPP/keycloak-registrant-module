@@ -1,4 +1,4 @@
-package openspp.keycloak.user.auth.email.otp;
+package openspp.keycloak.user.auth.pds;
 
 import java.util.List;
 
@@ -13,11 +13,17 @@ import org.keycloak.provider.ProviderConfigProperty;
 import com.google.auto.service.AutoService;
 
 @AutoService(AuthenticatorFactory.class)
-public class EmailAuthenticatorFormFactory implements AuthenticatorFactory {
+public class PDSAuthenticatorFactory implements AuthenticatorFactory {
+    public static final String PROVIDER_ID = "pds-authenticator";
+
+    @Override
+    public String getId() {
+        return PROVIDER_ID;
+    }
 
     @Override
     public String getDisplayType() {
-        return "Email OTP";
+        return "PDS Authentication";
     }
 
     @Override
@@ -48,7 +54,7 @@ public class EmailAuthenticatorFormFactory implements AuthenticatorFactory {
 
     @Override
     public String getHelpText() {
-        return "Email OTP authenticator.";
+        return "PDS Authenticator.";
     }
 
     @Override
@@ -62,7 +68,7 @@ public class EmailAuthenticatorFormFactory implements AuthenticatorFactory {
 
     @Override
     public Authenticator create(KeycloakSession session) {
-        return new EmailAuthenticatorForm(session);
+        return new PDSAuthenticatorForm(session);
     }
 
     @Override
@@ -71,10 +77,5 @@ public class EmailAuthenticatorFormFactory implements AuthenticatorFactory {
 
     @Override
     public void postInit(KeycloakSessionFactory factory) {
-    }
-
-    @Override
-    public String getId() {
-        return EmailAuthenticatorForm.ID;
     }
 }

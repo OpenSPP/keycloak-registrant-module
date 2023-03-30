@@ -22,14 +22,6 @@ import lombok.extern.slf4j.Slf4j;
 public class OpenSPPUserStorageProviderFactory implements UserStorageProviderFactory<OpenSPPUserStorageProvider> {
 
     public static final String id = "openspp";
-    private static final String PARAMETER_PLACEHOLDER_HELP = " Use '?' as parameter placeholder character (replaced only once). ";
-    private static final String DEFAULT_HELP_TEXT = "Select to query all spp_partner_oidc you must return at least: \"id\". "
-            +
-            "            \"username\"," +
-            "            \"email\" (optional)," +
-            "            \"name\" (optional). Any other parameter can be mapped by aliases to a realm scope.";
-    private static final String PARAMETER_HELP = " The %s is passed as query parameter.";
-
     private Map<String, ProviderConfig> providerConfigPerInstance = new HashMap<>();
 
     @Override
@@ -60,15 +52,16 @@ public class OpenSPPUserStorageProviderFactory implements UserStorageProviderFac
         JDBC jdbc = JDBC.getByDescription(JDBC.POSTGRESQL.getDesc());
         providerConfig.dataSourceProvider.configure(url, jdbc, user, password, model.getName());
         providerConfig.queryConfigurations = new QueryConfigurations(
-                model.get("count"),
-                model.get("listAll"),
-                model.get("findById"),
-                model.get("findByUsername"),
-                model.get("findByPDSForm"),
-                model.get("findBySearchTerm"),
-                model.get("findPasswordHash"),
-                model.get("findPasswordHashAlt"),
-                jdbc);
+                Query.getCount(),
+                Query.getListAll(),
+                Query.getFindById(),
+                Query.getFindByUsername(),
+                Query.getFindByPDSForm(),
+                Query.getFindBySearchTerm(),
+                Query.getFindPasswordHash(),
+                Query.getFindPasswordHashAlt(),
+                jdbc
+        );
         return providerConfig;
     }
 
@@ -118,86 +111,6 @@ public class OpenSPPUserStorageProviderFactory implements UserStorageProviderFac
                 .helpText("JDBC Connection Password")
                 .type(ProviderConfigProperty.PASSWORD)
                 .defaultValue("odoopassword")
-                .add();
-
-        // Queries
-
-        pcBuilder.property()
-                .name("count")
-                .label("User count SQL query")
-                .helpText("SQL query returning the total count of spp_partner_oidc")
-                .type(ProviderConfigProperty.STRING_TYPE)
-                .defaultValue("SELECT COUNT(*) FROM spp_partner_oidc")
-                .add();
-
-        pcBuilder.property()
-                .name("listAll")
-                .label("List All Users SQL query")
-                .helpText(DEFAULT_HELP_TEXT)
-                .type(ProviderConfigProperty.STRING_TYPE)
-                .defaultValue("SELECT id, id AS partner_id, username, email, phone, first_name, last_name, full_name FROM spp_partner_oidc")
-                .add();
-
-        pcBuilder.property()
-                .name("findById")
-                .label("Find user by id SQL query")
-                .helpText(DEFAULT_HELP_TEXT + String.format(PARAMETER_HELP, "user id")
-                        + PARAMETER_PLACEHOLDER_HELP)
-                .type(ProviderConfigProperty.STRING_TYPE)
-                .defaultValue(
-                        "SELECT id, id AS partner_id, username, email, phone, first_name, last_name, full_name FROM spp_partner_oidc WHERE \"id\" = ? ")
-                .add();
-
-        pcBuilder.property()
-                .name("findByUsername")
-                .label("Find user by username SQL query")
-                .helpText(
-                        DEFAULT_HELP_TEXT + String.format(PARAMETER_HELP, "user username")
-                                + PARAMETER_PLACEHOLDER_HELP)
-                .type(ProviderConfigProperty.STRING_TYPE)
-                .defaultValue(
-                        "SELECT id, id AS partner_id, username, email, phone, first_name, last_name, full_name FROM spp_partner_oidc WHERE \"username\" = ? ")
-                .add();
-
-        pcBuilder.property()
-                .name("findByPDSForm")
-                .label("Find user by PDS form SQL query")
-                .helpText(
-                        DEFAULT_HELP_TEXT + String.format(PARAMETER_HELP, "PDS, UID, Family numbers")
-                                + PARAMETER_PLACEHOLDER_HELP)
-                .type(ProviderConfigProperty.STRING_TYPE)
-                .defaultValue(
-                        "SELECT id, id AS partner_id, username, email, phone, first_name, last_name, full_name, is_group, kind_name, id_type_name, id_type_value FROM spp_partner_oidc WHERE (\"id_type_name\" = 'PDS' AND \"id_type_value\" = ? AND \"username\" = ?) OR (\"id_type_name\" = 'Unified ID' AND \"id_type_value\" = ? AND \"phone\" = ?)")
-                .add();
-
-        pcBuilder.property()
-                .name("findBySearchTerm")
-                .label("Find user by search term SQL query")
-                .helpText(DEFAULT_HELP_TEXT + String.format(PARAMETER_HELP, "search term")
-                        + PARAMETER_PLACEHOLDER_HELP)
-                .type(ProviderConfigProperty.STRING_TYPE)
-                .defaultValue(
-                        "SELECT id, id AS partner_id, username, email, phone, first_name, last_name, full_name FROM spp_partner_oidc WHERE \"username\" ILIKE (?) or \"email\" ILIKE (?) or \"full_name\" ILIKE (?)")
-                .add();
-
-        pcBuilder.property()
-                .name("findPasswordHash")
-                .label("Find password hash PBKDF2 SQL query")
-                .helpText(
-                        DEFAULT_HELP_TEXT + String.format(PARAMETER_HELP, "user username")
-                                + PARAMETER_PLACEHOLDER_HELP)
-                .type(ProviderConfigProperty.STRING_TYPE)
-                .defaultValue("SELECT password FROM spp_partner_oidc WHERE \"username\" = ? ")
-                .add();
-
-        pcBuilder.property()
-                .name("findPasswordHashAlt")
-                .label("Find password hash PBKDF2 SQL alt query")
-                .helpText(
-                        DEFAULT_HELP_TEXT + String.format(PARAMETER_HELP, "user alternative attribute")
-                                + PARAMETER_PLACEHOLDER_HELP)
-                .type(ProviderConfigProperty.STRING_TYPE)
-                .defaultValue("SELECT password FROM spp_partner_oidc WHERE \"id_type_value\" = ? ")
                 .add();
 
         return pcBuilder.build();

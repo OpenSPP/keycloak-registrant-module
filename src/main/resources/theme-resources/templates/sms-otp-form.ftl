@@ -21,15 +21,15 @@
 
                 <div id="kc-form-buttons" class="${properties.kcFormButtonsClass!}">
                     <input class="${properties.kcButtonClass!} ${properties.kcButtonPrimaryClass!} ${properties.kcButtonLargeClass!}"
-                        type="submit" value="${msg("doSubmit")}"/>
+                        type="submit" value="${msg('doSubmit')}"/>
 
                     <input name="resend"
                         class="${properties.kcButtonClass!} ${properties.kcButtonPrimaryClass!} ${properties.kcButtonLargeClass!}"
-                        type="submit" value="${msg("resendOTP")}"/>
+                        type="submit" value="${msg('resendOTP')}"/>
 
                     <input name="cancel"
                         class="${properties.kcButtonClass!} ${properties.kcButtonPrimaryClass!} ${properties.kcButtonLargeClass!}"
-                        type="submit" value="${msg("doCancel")}"/>
+                        type="submit" value="${msg('doCancel')}"/>
                 </div>
             </div>
         </form>

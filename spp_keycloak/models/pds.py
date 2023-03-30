@@ -10,8 +10,7 @@ _logger = logging.getLogger(__name__)
 
 
 class PDSBaseIn(NaiveOrmModel):
-    family_number: str
-    pds_number: str
+    household_number: str
     uid_number: str
     phone_number: str
 

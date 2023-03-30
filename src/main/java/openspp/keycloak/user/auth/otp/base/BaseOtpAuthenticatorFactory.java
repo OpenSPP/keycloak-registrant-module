@@ -1,4 +1,6 @@
-package openspp.keycloak.user.auth.sms.otp;
+package openspp.keycloak.user.auth.otp.base;
+
+import java.util.List;
 
 import org.keycloak.Config;
 import org.keycloak.authentication.Authenticator;
@@ -8,26 +10,13 @@ import org.keycloak.models.KeycloakSession;
 import org.keycloak.models.KeycloakSessionFactory;
 import org.keycloak.provider.ProviderConfigProperty;
 
-import java.util.List;
 
-public class SmsAuthenticatorFactory implements AuthenticatorFactory {
+public abstract class BaseOtpAuthenticatorFactory implements AuthenticatorFactory {
+    public abstract String getId();
 
-    public static final String PROVIDER_ID = "sms-authenticator";
+    public abstract String getDisplayType();
 
-    @Override
-    public String getId() {
-        return PROVIDER_ID;
-    }
-
-    @Override
-    public String getDisplayType() {
-        return "SMS Authentication";
-    }
-
-    @Override
-    public String getHelpText() {
-        return "Validates an OTP code sent via SMS.";
-    }
+    public abstract String getHelpText();
 
     @Override
     public String getReferenceCategory() {
@@ -57,18 +46,12 @@ public class SmsAuthenticatorFactory implements AuthenticatorFactory {
             new ProviderConfigProperty("ttl", "Time-to-live",
                     "The time to live in seconds for the code to be valid.", ProviderConfigProperty.STRING_TYPE,
                     "300"),
-            new ProviderConfigProperty("senderId", "SenderId",
-                    "The sender ID is displayed as the message sender on the receiving device.",
-                    ProviderConfigProperty.STRING_TYPE, "Keycloak"),
             new ProviderConfigProperty("simulation", "Simulation mode",
                     "In simulation mode, the SMS won't be sent, but printed to the server logs",
                     ProviderConfigProperty.BOOLEAN_TYPE, true));
     }
 
-    @Override
-    public Authenticator create(KeycloakSession session) {
-        return new SmsAuthenticatorForm();
-    }
+    public abstract Authenticator create(KeycloakSession session);
 
     @Override
     public void init(Config.Scope config) {

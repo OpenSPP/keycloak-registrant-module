@@ -1,4 +1,4 @@
-package openspp.keycloak.user.auth.sms.otp.service;
+package openspp.keycloak.user.auth.otp.sms.service;
 
 import org.jboss.logging.Logger;
 

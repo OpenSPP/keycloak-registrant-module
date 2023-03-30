@@ -6,25 +6,30 @@
         <form id="kc-u2f-login-form" class="${properties.kcFormClass!}" action="${url.loginAction}" method="post">
             <div class="${properties.kcFormGroupClass!}">
                 <div class="${properties.kcLabelWrapperClass!}">
-                    <label for="emailOTP">${msg("emailAuthLabel")}</label>
+                    <label for="code">${msg("emailAuthLabel")}</label>
                 </div>
                 <div class="${properties.kcInputWrapperClass!}">
-                    <input id="emailOTP" name="emailOTP" type="text" inputmode="numeric" pattern="[0-9]*"/>
+                    <input type="text" id="code" name="code" class="${properties.kcInputClass!}" autofocus/>
                 </div>
             </div>
-
             <div class="${properties.kcFormGroupClass!} ${properties.kcFormSettingClass!}">
+                <div id="kc-form-options" class="${properties.kcFormOptionsClass!}">
+                    <div class="${properties.kcFormOptionsWrapperClass!}">
+                        <span><a href="${url.loginUrl}">${kcSanitize(msg("backToLogin"))?no_esc}</a></span>
+                    </div>
+                </div>
+
                 <div id="kc-form-buttons" class="${properties.kcFormButtonsClass!}">
                     <input class="${properties.kcButtonClass!} ${properties.kcButtonPrimaryClass!} ${properties.kcButtonLargeClass!}"
-                        type="submit" value="${msg("doSubmit")}"/>
+                        type="submit" value="${msg('doSubmit')}"/>
 
                     <input name="resend"
                         class="${properties.kcButtonClass!} ${properties.kcButtonPrimaryClass!} ${properties.kcButtonLargeClass!}"
-                        type="submit" value="${msg("resendOTP")}"/>
+                        type="submit" value="${msg('resendOTP')}"/>
 
                     <input name="cancel"
                         class="${properties.kcButtonClass!} ${properties.kcButtonPrimaryClass!} ${properties.kcButtonLargeClass!}"
-                        type="submit" value="${msg("doCancel")}"/>
+                        type="submit" value="${msg('doCancel')}"/>
                 </div>
             </div>
         </form>

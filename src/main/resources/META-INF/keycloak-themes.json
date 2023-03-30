@@ -5,6 +5,12 @@
       "types": [
         "email"
       ]
+    },
+    {
+      "name" : "pds",
+      "types": [
+        "login"
+      ]
     }
   ]
 }

@@ -43,7 +43,7 @@ class PDSApiService(Component):
         logging.info("v" * 80)
         logging.info("Change Phone number")
         logging.info(
-            f"Family={info.family_number} PDS={info.pds_number} Unified ID={info.uid_number} Phone={info.phone_number}")
+            f"Household={info.household_number} Unified ID={info.uid_number} Phone={info.phone_number}")
 
         group = self._find_group(info)
         individual = self._find_indvidual(info, updating_phone=True)
@@ -94,7 +94,7 @@ class PDSApiService(Component):
         logging.info("v" * 80)
         logging.info("Change OIDC password")
         logging.info(
-            f"Family={info.family_number} PDS={info.pds_number} Unified ID={info.uid_number} Phone={info.phone_number} Password=***")
+            f"Household={info.household_number} Unified ID={info.uid_number} Phone={info.phone_number} Password=***")
 
         group = self._find_group(info)
         individual = self._find_indvidual(info)
@@ -138,9 +138,7 @@ class PDSApiService(Component):
 
     def _find_group(self, info: PDSBaseIn):
         group = self.env["spp.partner.oidc"].search([
-            ("id_type_name", "=", "PDS"),
-            ("id_type_value", "=", info.pds_number),
-            ("username", "=", info.family_number),
+            ("username", "=", info.household_number),
         ])
 
         if len(group) > 0:
