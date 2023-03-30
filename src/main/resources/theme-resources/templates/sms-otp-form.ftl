@@ -6,7 +6,7 @@
         <form id="kc-sms-code-login-form" class="${properties.kcFormClass!}" action="${url.loginAction}" method="post">
             <div class="${properties.kcFormGroupClass!}">
                 <div class="${properties.kcLabelWrapperClass!}">
-                    <label for="code" class="${properties.kcLabelClass!}">${msg("smsAuthLabel")}</label>
+                    <label for="code" class="${properties.kcLabelClass!}">${msg("otpAuthLabel")}</label>
                 </div>
                 <div class="${properties.kcInputWrapperClass!}">
                     <input type="text" id="code" name="code" class="${properties.kcInputClass!}" autofocus/>

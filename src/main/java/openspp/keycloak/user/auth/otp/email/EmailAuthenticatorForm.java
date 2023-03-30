@@ -16,10 +16,11 @@ import org.keycloak.models.KeycloakSession;
 import org.keycloak.models.RealmModel;
 import org.keycloak.models.UserModel;
 
-import lombok.extern.jbosslog.JBossLog;
+import lombok.extern.slf4j.Slf4j;
 import openspp.keycloak.user.auth.otp.base.BaseOtpAuthenticatorForm;
 
-@JBossLog
+
+@Slf4j
 public class EmailAuthenticatorForm extends BaseOtpAuthenticatorForm {
     static final String TEMPLATE = "email-otp-form.ftl";
 
@@ -31,8 +32,11 @@ public class EmailAuthenticatorForm extends BaseOtpAuthenticatorForm {
         RealmModel realm = context.getRealm();
         UserModel user = context.getUser();
         if (user.getEmail() == null) {
-            log.warnf("Could not send OTP email due to missing email. realm=%s user=%s", realm.getId(),
-                    user.getUsername());
+            log.warn(
+                "Could not send OTP email due to missing email. realm={} user={}",
+                realm.getId(),
+                user.getUsername()
+            );
             throw new AuthenticationFlowException(AuthenticationFlowError.INVALID_USER);
         }
 
@@ -50,7 +54,11 @@ public class EmailAuthenticatorForm extends BaseOtpAuthenticatorForm {
             emailProvider.send("emailOTPSubject", subjectParams, "otp-email.ftl", mailBodyAttributes);
             context.challenge(context.form().setAttribute("realm", context.getRealm()).createForm(TEMPLATE));
         } catch (EmailException e) {
-            log.errorf(e, "Failed to send OTP email. realm=%s user=%s", realm.getId(), user.getUsername());
+            log.error(
+                "Failed to send OTP email. realm={} user={}",
+                realm.getId(),
+                user.getUsername()
+            );
             context.failureChallenge(AuthenticationFlowError.INTERNAL_ERROR,
                     context.form().setError("emailAuthEmailNotSent", e.getMessage())
                             .createErrorPage(Response.Status.INTERNAL_SERVER_ERROR));

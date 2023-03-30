@@ -1,15 +1,9 @@
 {
   "themes": [
     {
-      "name": "email-otp-theme",
+      "name": "openspp",
       "types": [
         "email"
-      ]
-    },
-    {
-      "name" : "pds",
-      "types": [
-        "login"
       ]
     }
   ]

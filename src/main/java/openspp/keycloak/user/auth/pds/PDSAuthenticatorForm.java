@@ -3,7 +3,6 @@ package openspp.keycloak.user.auth.pds;
 import javax.ws.rs.core.MultivaluedMap;
 import javax.ws.rs.core.Response;
 
-import org.apache.commons.lang3.StringUtils;
 import org.jboss.resteasy.specimpl.MultivaluedMapImpl;
 import org.keycloak.authentication.AuthenticationFlowContext;
 import org.keycloak.authentication.AuthenticationFlowError;
@@ -24,6 +23,7 @@ import com.google.i18n.phonenumbers.PhoneNumberUtil.PhoneNumberFormat;
 import com.google.i18n.phonenumbers.Phonenumber.PhoneNumber;
 
 import lombok.extern.slf4j.Slf4j;
+
 
 @Slf4j
 public class PDSAuthenticatorForm implements Authenticator {
@@ -83,15 +83,17 @@ public class PDSAuthenticatorForm implements Authenticator {
             boolean isPhoneNumberValid = false;
             try {
                 PhoneNumber iPNumber = phoneNumberUtil.parse(formData.getFirst(FIELD_PHONE_NUMBER), null);
+                phoneNumber = phoneNumberUtil.format(iPNumber, PhoneNumberFormat.INTERNATIONAL);
                 if (phoneNumberUtil.isValidNumber(iPNumber)) {
-                    phoneNumber = phoneNumberUtil.format(iPNumber, PhoneNumberFormat.INTERNATIONAL);
                     isPhoneNumberValid = true;
                 }
             } catch (Exception e) {
                 isPhoneNumberValid = false;
+                log.error("Something wrong when trying to validate and format phone number: {}", phoneNumber);
             }
 
             if (!isPhoneNumberValid) {
+                log.error("Invalid phone number: {}", phoneNumber);
                 Response challengeResponse = challenge(context, "invalidPhoneNumberMessage", FIELD_PHONE_NUMBER);
                 context.forceChallenge(challengeResponse);
                 return false;

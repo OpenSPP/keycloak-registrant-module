@@ -4,11 +4,16 @@ import java.util.ArrayList;
 import java.util.List;
 
 import org.keycloak.authentication.Authenticator;
+import org.keycloak.authentication.AuthenticatorFactory;
 import org.keycloak.models.KeycloakSession;
 import org.keycloak.provider.ProviderConfigProperty;
 
+import com.google.auto.service.AutoService;
+
 import openspp.keycloak.user.auth.otp.base.BaseOtpAuthenticatorFactory;
 
+
+@AutoService(AuthenticatorFactory.class)
 public class SmsAuthenticatorFactory extends BaseOtpAuthenticatorFactory {
     public static final String PROVIDER_ID = "sms-authenticator";
 
@@ -33,9 +38,14 @@ public class SmsAuthenticatorFactory extends BaseOtpAuthenticatorFactory {
         List<ProviderConfigProperty> pcpNew = new ArrayList<ProviderConfigProperty>();
         pcpNew.addAll(pcp);
         pcpNew.add(
-            new ProviderConfigProperty("senderId", "SenderId",
+            new ProviderConfigProperty("senderId", "Sender ID",
                     "The sender ID is displayed as the message sender on the receiving device.",
-                    ProviderConfigProperty.STRING_TYPE, "Keycloak")
+                    ProviderConfigProperty.STRING_TYPE, "OpenSPP")
+        );
+        pcpNew.add(
+            new ProviderConfigProperty("simulationEmail", "Simulation email",
+                    "The email to receive OTP code in SIMULATION mode.",
+                    ProviderConfigProperty.STRING_TYPE, "")
         );
 
         return pcpNew;

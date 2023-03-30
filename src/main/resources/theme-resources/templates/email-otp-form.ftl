@@ -6,7 +6,7 @@
         <form id="kc-u2f-login-form" class="${properties.kcFormClass!}" action="${url.loginAction}" method="post">
             <div class="${properties.kcFormGroupClass!}">
                 <div class="${properties.kcLabelWrapperClass!}">
-                    <label for="code">${msg("emailAuthLabel")}</label>
+                    <label for="code">${msg("otpAuthLabel")}</label>
                 </div>
                 <div class="${properties.kcInputWrapperClass!}">
                     <input type="text" id="code" name="code" class="${properties.kcInputClass!}" autofocus/>

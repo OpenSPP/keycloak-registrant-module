@@ -12,6 +12,7 @@ import org.keycloak.provider.ProviderConfigProperty;
 
 import com.google.auto.service.AutoService;
 
+
 @AutoService(AuthenticatorFactory.class)
 public class PDSAuthenticatorFactory implements AuthenticatorFactory {
     public static final String PROVIDER_ID = "pds-authenticator";
