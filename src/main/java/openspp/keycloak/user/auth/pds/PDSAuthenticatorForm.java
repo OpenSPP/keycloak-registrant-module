@@ -18,6 +18,7 @@ import org.keycloak.models.utils.FormMessage;
 import org.keycloak.services.ServicesLogger;
 import org.keycloak.services.messages.Messages;
 
+import com.google.i18n.phonenumbers.NumberParseException;
 import com.google.i18n.phonenumbers.PhoneNumberUtil;
 import com.google.i18n.phonenumbers.PhoneNumberUtil.PhoneNumberFormat;
 import com.google.i18n.phonenumbers.Phonenumber.PhoneNumber;
@@ -69,6 +70,20 @@ public class PDSAuthenticatorForm implements Authenticator {
         }
     }
 
+    private PhoneNumber parsePhoneNumber(String phoneNumber) throws NumberParseException {
+        PhoneNumber pn = null;
+        try {
+            pn = phoneNumberUtil.parse(phoneNumber, null);
+        } catch (NumberParseException e) {
+            // Trying to fix the international prefix and parse again
+            if (phoneNumber.startsWith("0")) {
+                pn = phoneNumberUtil.parse(phoneNumber.replaceAll("^0", "+"), null);
+            }
+        }
+
+        return pn;
+    }
+
     protected boolean validateForm(AuthenticationFlowContext context, MultivaluedMap<String, String> formData) {
         if (formData.containsKey(FIELD_UID)
                 && formData.containsKey(FIELD_HOUSEHOLD_NUMBER)
@@ -82,14 +97,14 @@ public class PDSAuthenticatorForm implements Authenticator {
 
             boolean isPhoneNumberValid = false;
             try {
-                PhoneNumber iPNumber = phoneNumberUtil.parse(formData.getFirst(FIELD_PHONE_NUMBER), null);
-                phoneNumber = phoneNumberUtil.format(iPNumber, PhoneNumberFormat.INTERNATIONAL);
-                if (phoneNumberUtil.isValidNumber(iPNumber)) {
+                PhoneNumber pn = parsePhoneNumber(phoneNumber);
+                phoneNumber = phoneNumberUtil.format(pn, PhoneNumberFormat.E164);
+                if (phoneNumberUtil.isValidNumber(pn)) {
                     isPhoneNumberValid = true;
                 }
             } catch (Exception e) {
                 isPhoneNumberValid = false;
-                log.error("Something wrong when trying to validate and format phone number: {}", phoneNumber);
+                log.error("Something wrong when trying to validate and format phone number: {} \n {}", phoneNumber, e);
             }
 
             if (!isPhoneNumberValid) {

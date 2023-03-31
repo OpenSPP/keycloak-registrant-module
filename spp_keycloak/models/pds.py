@@ -1,4 +1,5 @@
 import logging
+import re
 from pydantic import validator
 from typing import List, Optional
 from odoo import _, api
@@ -18,10 +19,10 @@ class PDSBaseIn(NaiveOrmModel):
     def phone_validation(cls, v):
         if v:
             v = phone_validation.phone_format(
-                v,
+                re.sub('^0', '+', v),
                 None,
                 None,
-                force_format="INTERNATIONAL",
+                force_format="E164",
                 raise_exception=False,
             )
             _logger.debug(f"phone_number: {v}")
