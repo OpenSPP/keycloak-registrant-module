@@ -10,15 +10,17 @@ import org.keycloak.models.KeycloakSession;
 import org.keycloak.models.RealmModel;
 
 import lombok.extern.slf4j.Slf4j;
+import openspp.keycloak.user.auth.otp.base.BaseOtpAuthenticatorFactory;
 import openspp.keycloak.user.auth.otp.base.BaseOtpAuthenticatorForm;
+import openspp.keycloak.user.auth.otp.sms.SmsAuthenticatorFactory;
 
 
 @Slf4j
 public class SmsServiceFactory {
 
     public static SmsService create(AuthenticationFlowContext context, Map<String, String> config) {
-        if (Boolean.parseBoolean(config.getOrDefault("simulation", "false"))) {
-            String email = config.get("simulationEmail");
+        if (Boolean.parseBoolean(config.getOrDefault(BaseOtpAuthenticatorFactory.SIMULATION_FIELD, "false"))) {
+            String email = config.get(SmsAuthenticatorFactory.SIMULATION_EMAIL_FIELD);
             KeycloakSession session = context.getSession();
             RealmModel realm = context.getRealm();
             String realmName = realm.getDisplayName() != null ? realm.getDisplayName() : realm.getName();
@@ -30,11 +32,11 @@ public class SmsServiceFactory {
                     message
                 );
                 log.warn("^".repeat(80));
-                if (email != null) {
+                if (email != null && !email.isEmpty()) {
                     List<Object> subjectParams = List.of(realmName);
                     Map<String, Object> mailBodyAttributes = new HashMap<>();
                     mailBodyAttributes.put(BaseOtpAuthenticatorForm.CODE_FIELD, code);
-                    mailBodyAttributes.put(BaseOtpAuthenticatorForm.TTL_FIELD, Math.floorDiv(ttl, 60));
+                    mailBodyAttributes.put(BaseOtpAuthenticatorFactory.TTL_FIELD, Math.floorDiv(ttl, 60));
                     EmailTemplateProvider emailProvider = session.getProvider(EmailTemplateProvider.class);
                     emailProvider.setRealm(realm);
                     emailProvider.setUser(context.getUser());

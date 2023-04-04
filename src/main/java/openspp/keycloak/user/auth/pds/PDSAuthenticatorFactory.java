@@ -1,5 +1,6 @@
 package openspp.keycloak.user.auth.pds;
 
+import java.util.Hashtable;
 import java.util.List;
 
 import org.keycloak.Config;
@@ -17,6 +18,8 @@ import com.google.auto.service.AutoService;
 public class PDSAuthenticatorFactory implements AuthenticatorFactory {
     public static final String PROVIDER_ID = "pds-authenticator";
 
+    public static final String INT_PHONE_CODE_FIELD = "intPhoneCode";
+
     @Override
     public String getId() {
         return PROVIDER_ID;
@@ -29,19 +32,13 @@ public class PDSAuthenticatorFactory implements AuthenticatorFactory {
 
     @Override
     public String getReferenceCategory() {
-        return null;
+        return "oidc";
     }
 
     @Override
     public boolean isConfigurable() {
-        return false;
+        return true;
     }
-
-    public static final AuthenticationExecutionModel.Requirement[] REQUIREMENT_CHOICES = {
-            AuthenticationExecutionModel.Requirement.REQUIRED,
-            AuthenticationExecutionModel.Requirement.ALTERNATIVE,
-            AuthenticationExecutionModel.Requirement.DISABLED
-    };
 
     @Override
     public AuthenticationExecutionModel.Requirement[] getRequirementChoices() {
@@ -50,7 +47,7 @@ public class PDSAuthenticatorFactory implements AuthenticatorFactory {
 
     @Override
     public boolean isUserSetupAllowed() {
-        return false;
+        return true;
     }
 
     @Override
@@ -60,11 +57,10 @@ public class PDSAuthenticatorFactory implements AuthenticatorFactory {
 
     @Override
     public List<ProviderConfigProperty> getConfigProperties() {
-        return null;
-    }
-
-    @Override
-    public void close() {
+        return List.of(
+            // TODO: Make a list of standard international phone code with google/libphonenumber.
+            new ProviderConfigProperty(INT_PHONE_CODE_FIELD, "International Country Phone Code", "The internation phone code for the country.",
+                    ProviderConfigProperty.STRING_TYPE, "+964"));
     }
 
     @Override
@@ -78,5 +74,9 @@ public class PDSAuthenticatorFactory implements AuthenticatorFactory {
 
     @Override
     public void postInit(KeycloakSessionFactory factory) {
+    }
+
+    @Override
+    public void close() {
     }
 }

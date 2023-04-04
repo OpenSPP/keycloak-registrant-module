@@ -22,6 +22,11 @@ public class SmsAuthenticatorForm extends BaseOtpAuthenticatorForm {
     private static final String TEMPLATE = "sms-otp-form.ftl";
 
     @Override
+    public String getTemplate() {
+        return TEMPLATE;
+    }
+
+    @Override
     public void sendOtp(AuthenticationFlowContext context, String code, int ttl) {
         AuthenticatorConfigModel config = context.getAuthenticatorConfig();
         KeycloakSession session = context.getSession();

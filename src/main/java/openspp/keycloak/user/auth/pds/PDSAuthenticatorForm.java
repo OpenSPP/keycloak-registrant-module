@@ -9,6 +9,7 @@ import org.keycloak.authentication.AuthenticationFlowError;
 import org.keycloak.authentication.Authenticator;
 import org.keycloak.forms.login.LoginFormsProvider;
 import org.keycloak.models.AuthenticationExecutionModel;
+import org.keycloak.models.AuthenticatorConfigModel;
 import org.keycloak.models.KeycloakSession;
 import org.keycloak.models.ModelDuplicateException;
 import org.keycloak.models.RealmModel;
@@ -41,7 +42,6 @@ public class PDSAuthenticatorForm implements Authenticator {
         FIELD_HOUSEHOLD_NUMBER,
         FIELD_PHONE_NUMBER,
         FIELD_OTP,
-        FIELD_PASSWORD,
     };
 
     private final KeycloakSession session;
@@ -70,16 +70,33 @@ public class PDSAuthenticatorForm implements Authenticator {
         }
     }
 
-    private PhoneNumber parsePhoneNumber(String phoneNumber) throws NumberParseException {
+    private PhoneNumber parsePhoneNumber(AuthenticationFlowContext context, String phoneNumber) throws NumberParseException {
+        AuthenticatorConfigModel config = context.getAuthenticatorConfig();
         PhoneNumber pn = null;
-        try {
-            pn = phoneNumberUtil.parse(phoneNumber, null);
-        } catch (NumberParseException e) {
-            // Trying to fix the international prefix and parse again
-            if (phoneNumber.startsWith("0")) {
-                pn = phoneNumberUtil.parse(phoneNumber.replaceAll("^0", "+"), null);
+
+        // Pre-process phone number format
+        String intPhoneCode = config.getConfig().get(PDSAuthenticatorFactory.INT_PHONE_CODE_FIELD);
+
+        if (intPhoneCode != null && !intPhoneCode.isEmpty()) {
+            intPhoneCode = intPhoneCode.replaceAll("[^0-9]+", "");
+            String phoneDigits = phoneNumber.replaceAll("[^0-9]+", "");
+            
+            switch (phoneDigits.length()) {
+            case 10:
+                phoneNumber = "+" + intPhoneCode + phoneDigits;
+                break;
+            case 13:
+                phoneNumber = "+" + phoneDigits;
+                break;
+            case 14:
+                phoneNumber = "+" + intPhoneCode + phoneDigits.replaceAll("^00\\d{2}", "");
+                break;
+            default:
+                break;
             }
         }
+
+        pn = phoneNumberUtil.parse(phoneNumber, null);
 
         return pn;
     }
@@ -97,7 +114,7 @@ public class PDSAuthenticatorForm implements Authenticator {
 
             boolean isPhoneNumberValid = false;
             try {
-                PhoneNumber pn = parsePhoneNumber(phoneNumber);
+                PhoneNumber pn = parsePhoneNumber(context, phoneNumber);
                 phoneNumber = phoneNumberUtil.format(pn, PhoneNumberFormat.E164);
                 if (phoneNumberUtil.isValidNumber(pn)) {
                     isPhoneNumberValid = true;
@@ -117,7 +134,6 @@ public class PDSAuthenticatorForm implements Authenticator {
             context.getAuthenticationSession().setAuthNote(FIELD_UID, uidNumber);
             context.getAuthenticationSession().setAuthNote(FIELD_HOUSEHOLD_NUMBER, householdNumber);
             context.getAuthenticationSession().setAuthNote(FIELD_PHONE_NUMBER, phoneNumber);
-            context.getAuthenticationSession().setAuthNote(FIELD_PASSWORD, password);
 
             UserModel user = null;
             try {
@@ -179,11 +195,17 @@ public class PDSAuthenticatorForm implements Authenticator {
         
         MultivaluedMap<String, String> formData = new MultivaluedMapImpl<>();
         
-        for (int i=0; i<FIELDS.length; i++) {
-            if (context.getAuthenticationSession().getAuthNote(FIELDS[i]) != null) {
+        String[] formFields = {
+            FIELD_UID,
+            FIELD_HOUSEHOLD_NUMBER,
+            FIELD_PHONE_NUMBER,
+        };
+    
+        for (int i=0; i<formFields.length; i++) {
+            if (context.getAuthenticationSession().getAuthNote(formFields[i]) != null) {
                 formData.add(
-                    FIELDS[i],
-                    context.getAuthenticationSession().getAuthNote(FIELDS[i])
+                    formFields[i],
+                    context.getAuthenticationSession().getAuthNote(formFields[i])
                 );
             }
         }

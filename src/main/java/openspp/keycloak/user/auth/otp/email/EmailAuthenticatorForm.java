@@ -17,6 +17,7 @@ import org.keycloak.models.RealmModel;
 import org.keycloak.models.UserModel;
 
 import lombok.extern.slf4j.Slf4j;
+import openspp.keycloak.user.auth.otp.base.BaseOtpAuthenticatorFactory;
 import openspp.keycloak.user.auth.otp.base.BaseOtpAuthenticatorForm;
 
 
@@ -25,6 +26,11 @@ public class EmailAuthenticatorForm extends BaseOtpAuthenticatorForm {
     static final String TEMPLATE = "email-otp-form.ftl";
 
     public static final String EMAIL_OTP = "emailOTP";
+
+    @Override
+    public String getTemplate() {
+        return TEMPLATE;
+    }
 
     @Override
     public void sendOtp(AuthenticationFlowContext context, String code, int ttl) {
@@ -43,7 +49,7 @@ public class EmailAuthenticatorForm extends BaseOtpAuthenticatorForm {
         Map<String, Object> mailBodyAttributes = new HashMap<>();
         mailBodyAttributes.put("username", user.getUsername());
         mailBodyAttributes.put(CODE_FIELD, code);
-        mailBodyAttributes.put(TTL_FIELD, Math.floorDiv(ttl, 60));
+        mailBodyAttributes.put(BaseOtpAuthenticatorFactory.TTL_FIELD, Math.floorDiv(ttl, 60));
 
         String realmName = realm.getDisplayName() != null ? realm.getDisplayName() : realm.getName();
         List<Object> subjectParams = List.of(realmName);
@@ -52,7 +58,7 @@ public class EmailAuthenticatorForm extends BaseOtpAuthenticatorForm {
             emailProvider.setRealm(realm);
             emailProvider.setUser(user);
             emailProvider.send("emailOTPSubject", subjectParams, "otp-email.ftl", mailBodyAttributes);
-            context.challenge(context.form().setAttribute("realm", context.getRealm()).createForm(TEMPLATE));
+            challenge(context, null);
         } catch (EmailException e) {
             log.error(
                 "Failed to send OTP email. realm={} user={}",

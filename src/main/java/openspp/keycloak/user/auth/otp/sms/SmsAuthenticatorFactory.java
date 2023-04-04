@@ -16,6 +16,9 @@ import openspp.keycloak.user.auth.otp.base.BaseOtpAuthenticatorFactory;
 @AutoService(AuthenticatorFactory.class)
 public class SmsAuthenticatorFactory extends BaseOtpAuthenticatorFactory {
     public static final String PROVIDER_ID = "sms-authenticator";
+    public static final String SENDER_ID_FIELD = "senderId";
+    public static final String SIMULATION_EMAIL_FIELD = "simulationEmail";
+    public static final String AWS_TOPIC_ARN_FIELD = "topicArn";
 
     @Override
     public String getId() {
@@ -37,13 +40,18 @@ public class SmsAuthenticatorFactory extends BaseOtpAuthenticatorFactory {
         List<ProviderConfigProperty> pcp = super.getConfigProperties();
         List<ProviderConfigProperty> pcpNew = new ArrayList<ProviderConfigProperty>();
         pcpNew.addAll(pcp);
-        pcpNew.add(
-            new ProviderConfigProperty("senderId", "Sender ID",
+        pcpNew.add(0,
+            new ProviderConfigProperty(SENDER_ID_FIELD, "Sender ID",
                     "The sender ID is displayed as the message sender on the receiving device.",
                     ProviderConfigProperty.STRING_TYPE, "OpenSPP")
         );
+        pcpNew.add(1,
+            new ProviderConfigProperty(AWS_TOPIC_ARN_FIELD, "AWS SNS Topic ARN",
+                    "The AWS SNS Topic ARN URI using for SMS service.",
+                    ProviderConfigProperty.STRING_TYPE, "")
+        );
         pcpNew.add(
-            new ProviderConfigProperty("simulationEmail", "Simulation email",
+            new ProviderConfigProperty(SIMULATION_EMAIL_FIELD, "Simulation email",
                     "The email to receive OTP code in SIMULATION mode.",
                     ProviderConfigProperty.STRING_TYPE, "")
         );
