@@ -2,4 +2,4 @@
 
 
 from . import res_partner
-from . import pds
+from . import oidc

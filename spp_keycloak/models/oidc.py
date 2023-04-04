@@ -10,7 +10,7 @@ from .naive_orm_model import NaiveOrmModel
 _logger = logging.getLogger(__name__)
 
 
-class PDSBaseIn(NaiveOrmModel):
+class OIDCBaseIn(NaiveOrmModel):
     household_number: str
     uid_number: str
     phone_number: str
@@ -30,21 +30,21 @@ class PDSBaseIn(NaiveOrmModel):
             raise ValueError("Phone number must not empty")
         return v
 
-class PDSUpdatePhoneIn(PDSBaseIn):
+class OIDCUpdatePhoneIn(OIDCBaseIn):
     pass
 
-class PDSUpdatePaswordIn(PDSBaseIn):
+class OIDCUpdatePaswordIn(OIDCBaseIn):
     password: str
 
 
-class PDSBaseOut(NaiveOrmModel):
+class OIDCBaseOut(NaiveOrmModel):
     group_id: int = 0
     individual_id: int = 0
 
 
-class PDSUpdatePhoneOut(PDSBaseOut):
+class OIDCUpdatePhoneOut(OIDCBaseOut):
     phone_updated: bool = False
 
 
-class PDSUpdatePasswordOut(PDSBaseOut):
+class OIDCUpdatePasswordOut(OIDCBaseOut):
     password_updated: bool = False

@@ -25,7 +25,7 @@ import org.keycloak.storage.user.UserQueryProvider;
 import org.keycloak.storage.user.UserRegistrationProvider;
 
 import lombok.extern.slf4j.Slf4j;
-import openspp.keycloak.user.auth.pds.PDSAuthenticatorForm;
+import openspp.keycloak.user.auth.beneficiary.oidc.BeneficiaryOIDCAuthenticatorForm;
 import openspp.keycloak.user.storage.util.Paginator;
 
 @Slf4j
@@ -151,9 +151,9 @@ public class OpenSPPUserStorageProvider implements UserStorageProvider,
     public UserModel getUserByUsername(RealmModel realm, String username) {
         log.info("lookup user by username: realm={} username={}", realm.getId(), username);
 
-        String uidNumber = session.getContext().getAuthenticationSession().getAuthNote(PDSAuthenticatorForm.FIELD_UID);
-        String householdNumber = session.getContext().getAuthenticationSession().getAuthNote(PDSAuthenticatorForm.FIELD_HOUSEHOLD_NUMBER);
-        String phoneNumber = session.getContext().getAuthenticationSession().getAuthNote(PDSAuthenticatorForm.FIELD_PHONE_NUMBER);
+        String uidNumber = session.getContext().getAuthenticationSession().getAuthNote(BeneficiaryOIDCAuthenticatorForm.FIELD_UID);
+        String householdNumber = session.getContext().getAuthenticationSession().getAuthNote(BeneficiaryOIDCAuthenticatorForm.FIELD_HOUSEHOLD_NUMBER);
+        String phoneNumber = session.getContext().getAuthenticationSession().getAuthNote(BeneficiaryOIDCAuthenticatorForm.FIELD_PHONE_NUMBER);
 
         if (uidNumber != null
             && householdNumber != null
@@ -162,7 +162,7 @@ public class OpenSPPUserStorageProvider implements UserStorageProvider,
 
             log.info(">>>>>>>>>>>>>>>> Input data: UID={} Phone={} Household={}", uidNumber, phoneNumber, householdNumber);
     
-            Stream<UserModel> users = toUserModelStream(realm, repository.findUsersByPDSForm(householdNumber, uidNumber, phoneNumber));
+            Stream<UserModel> users = toUserModelStream(realm, repository.findUsersByBeneficiaryForm(householdNumber, uidNumber, phoneNumber));
     
             Hashtable<String, UserModel> foundUsers = new Hashtable<>();
     
@@ -281,9 +281,9 @@ public class OpenSPPUserStorageProvider implements UserStorageProvider,
         return Stream.empty();
     }
 
-    public Stream<UserModel> getPDSUser(RealmModel realm, String uidNumber, String phoneNumber, String householdNumber) {
+    public Stream<UserModel> getBeneficiaryUser(RealmModel realm, String uidNumber, String phoneNumber, String householdNumber) {
         log.info("lookup user by id: realm={} UID={} Phone={} Household={}", realm.getId(), householdNumber, uidNumber, phoneNumber);
 
-        return toUserModelStream(realm, repository.findUsersByPDSForm(householdNumber, uidNumber, phoneNumber));
+        return toUserModelStream(realm, repository.findUsersByBeneficiaryForm(householdNumber, uidNumber, phoneNumber));
     }
 }

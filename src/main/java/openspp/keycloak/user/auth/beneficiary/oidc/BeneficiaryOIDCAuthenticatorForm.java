@@ -1,4 +1,4 @@
-package openspp.keycloak.user.auth.pds;
+package openspp.keycloak.user.auth.beneficiary.oidc;
 
 import javax.ws.rs.core.MultivaluedMap;
 import javax.ws.rs.core.Response;
@@ -28,8 +28,8 @@ import lombok.extern.slf4j.Slf4j;
 
 
 @Slf4j
-public class PDSAuthenticatorForm implements Authenticator {
-    static final String TEMPLATE = "pds-authenticator-form.ftl";
+public class BeneficiaryOIDCAuthenticatorForm implements Authenticator {
+    static final String TEMPLATE = "ben-oidc-authenticator-form.ftl";
 
     public static final String FIELD_UID = "uid";
     public static final String FIELD_HOUSEHOLD_NUMBER = "household_number";
@@ -47,7 +47,7 @@ public class PDSAuthenticatorForm implements Authenticator {
     private final KeycloakSession session;
     private final PhoneNumberUtil phoneNumberUtil = PhoneNumberUtil.getInstance();
 
-    public PDSAuthenticatorForm(KeycloakSession session) {
+    public BeneficiaryOIDCAuthenticatorForm(KeycloakSession session) {
         this.session = session;
     }
 
@@ -75,7 +75,7 @@ public class PDSAuthenticatorForm implements Authenticator {
         PhoneNumber pn = null;
 
         // Pre-process phone number format
-        String intPhoneCode = config.getConfig().get(PDSAuthenticatorFactory.INT_PHONE_CODE_FIELD);
+        String intPhoneCode = config.getConfig().get(BeneficiaryOIDCAuthenticatorFactory.INT_PHONE_CODE_FIELD);
 
         if (intPhoneCode != null && !intPhoneCode.isEmpty()) {
             intPhoneCode = intPhoneCode.replaceAll("[^0-9]+", "");

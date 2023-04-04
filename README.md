@@ -7,7 +7,7 @@ Features:
 - Password hashing for authentication with hex hash digest algorithm.
 - User's field in the database are automatically mapped as user's attribute in the client scope.
 - Group and role mapping are using internal keycloak mapping.
-- PDS authentication use multiple custom card numbers combined with phone number and password as credential.
+- Beneficiary Authentication use multiple custom card numbers combined with phone number and password as credential.
 - SMS OTP authentication with simulation mode and AWS SNS.
 - Email OTP authentication.
 
@@ -29,10 +29,10 @@ Features:
 7. Save and it is ready to use.
 8. Verify: go to Users menu, show all users by using `*` as the search keyword.
 
-#### PDS authentication
+#### Beneficiary Authentication
 1. Create new Authentication flow
 2. Add step
-3. Search for PDS and add to the flow
+3. Search for Beneficiary Authentication and add to the flow
 4. Select `Requirement` as `Require`
 5. Create or update existing client
 6. Go to Advanced tab and Select above authentication flow in the section `Authentication flow overrides`

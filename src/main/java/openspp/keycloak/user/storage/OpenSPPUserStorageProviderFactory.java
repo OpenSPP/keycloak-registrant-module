@@ -56,7 +56,7 @@ public class OpenSPPUserStorageProviderFactory implements UserStorageProviderFac
                 Query.getListAll(),
                 Query.getFindById(),
                 Query.getFindByUsername(),
-                Query.getFindByPDSForm(),
+                Query.getFindByBeneficiaryForm(),
                 Query.getFindBySearchTerm(),
                 Query.getFindPasswordHash(),
                 Query.getFindPasswordHashAlt(),

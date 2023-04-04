@@ -10,7 +10,7 @@
 </style>
 <@layout.registrationLayout displayInfo=true; section>
     <#if section="header">
-        ${msg("pdsAuthTitle",realm.displayName)}
+        ${msg("benOIDCAuthTitle",realm.displayName)}
     <#elseif section="form">
         <div id="kc-form">
             <div id="kc-form-wrapper">
@@ -19,22 +19,21 @@
                     <div class="${properties.kcFormGroupClass!}">
                         <label for="household_number" class="${properties.kcLabelClass!}">${msg("householdNumberField")}</label>
                         <input id="household_number" name="household_number" type="text" class="${properties.kcInputClass!}"
-                            value="${(pds.formData['household_number'])!''}" />
+                            value="${(login.formData['household_number'])!''}" />
                     </div>
                     <div class="${properties.kcFormGroupClass!}">
                         <label for="uid" class="${properties.kcLabelClass!}">${msg("uidNumberField")}</label>
                         <input id="uid" name="uid" type="text" class="${properties.kcInputClass!}"
-                            value="${(pds.formData['uid'])!''}" />
+                            value="${(login.formData['uid'])!''}" />
                     </div>
                     <div class="${properties.kcFormGroupClass!}">
                         <label for="phone_number" class="${properties.kcLabelClass!}">${msg("phoneNumberField")}</label>
                         <input id="phone_number" name="phone_number" type="text" class="${properties.kcInputClass!}"
-                            value="${(pds.formData['phone_number'])!''}" />
+                            value="${(login.formData['phone_number'])!''}" />
                     </div>
                     <div class="${properties.kcFormGroupClass!}">
                         <label for="password" class="${properties.kcLabelClass!}">${msg("passwordField")}</label>
-                        <input id="password" name="password" type="password" class="${properties.kcInputClass!}"
-                            value="${(pds.formData['password'])!''}" />
+                        <input id="password" name="password" type="password" class="${properties.kcInputClass!}" />
                     </div>
 
                     <div class="${properties.kcFormGroupClass!}">
@@ -52,6 +51,6 @@
             </div>
         </div>
     <#elseif section="info">
-        ${msg("pdsAuthInstruction")}
+        ${msg("benOIDCAuthInstruction")}
     </#if>
 </@layout.registrationLayout>

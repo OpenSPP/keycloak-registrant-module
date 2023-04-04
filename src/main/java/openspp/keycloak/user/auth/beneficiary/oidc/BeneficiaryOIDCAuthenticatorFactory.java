@@ -1,6 +1,5 @@
-package openspp.keycloak.user.auth.pds;
+package openspp.keycloak.user.auth.beneficiary.oidc;
 
-import java.util.Hashtable;
 import java.util.List;
 
 import org.keycloak.Config;
@@ -15,8 +14,8 @@ import com.google.auto.service.AutoService;
 
 
 @AutoService(AuthenticatorFactory.class)
-public class PDSAuthenticatorFactory implements AuthenticatorFactory {
-    public static final String PROVIDER_ID = "pds-authenticator";
+public class BeneficiaryOIDCAuthenticatorFactory implements AuthenticatorFactory {
+    public static final String PROVIDER_ID = "ben-oidc-authenticator";
 
     public static final String INT_PHONE_CODE_FIELD = "intPhoneCode";
 
@@ -27,7 +26,7 @@ public class PDSAuthenticatorFactory implements AuthenticatorFactory {
 
     @Override
     public String getDisplayType() {
-        return "PDS Authentication";
+        return "Beneficiary OIDC Authentication";
     }
 
     @Override
@@ -52,7 +51,7 @@ public class PDSAuthenticatorFactory implements AuthenticatorFactory {
 
     @Override
     public String getHelpText() {
-        return "PDS Authenticator.";
+        return "Beneficiary OIDC Authenticator.";
     }
 
     @Override
@@ -65,7 +64,7 @@ public class PDSAuthenticatorFactory implements AuthenticatorFactory {
 
     @Override
     public Authenticator create(KeycloakSession session) {
-        return new PDSAuthenticatorForm(session);
+        return new BeneficiaryOIDCAuthenticatorForm(session);
     }
 
     @Override

@@ -21,7 +21,7 @@ import org.apache.commons.lang3.NotImplementedException;
 import org.keycloak.models.KeycloakSession;
 
 import lombok.extern.slf4j.Slf4j;
-import openspp.keycloak.user.auth.pds.PDSAuthenticatorForm;
+import openspp.keycloak.user.auth.beneficiary.oidc.BeneficiaryOIDCAuthenticatorForm;
 import openspp.keycloak.user.storage.util.PBKDF2HashingUtil;
 import openspp.keycloak.user.storage.util.Paginator;
 import openspp.keycloak.user.storage.util.Paginator.Pageable;
@@ -154,8 +154,8 @@ public class UserRepository {
                 .stream().findFirst();
     }
 
-    public List<Map<String, String>> findUsersByPDSForm(String householdNumber, String uidNumber, String phoneNumber) {
-        return doQuery(queryConfigurations.getFindByPDSForm(), this::readMap, householdNumber, uidNumber, phoneNumber);
+    public List<Map<String, String>> findUsersByBeneficiaryForm(String householdNumber, String uidNumber, String phoneNumber) {
+        return doQuery(queryConfigurations.getFindByBeneficiaryForm(), this::readMap, householdNumber, uidNumber, phoneNumber);
     }
 
     public List<Map<String, String>> findUsers(String search, Paginator.Pageable pageable) {
@@ -168,9 +168,9 @@ public class UserRepository {
     public boolean validateCredentials(String username, String password) throws Exception {
         String param = username;
         String query = queryConfigurations.getFindPasswordHash();
-        String uid = session.getContext().getAuthenticationSession().getAuthNote(PDSAuthenticatorForm.FIELD_UID);
+        String uid = session.getContext().getAuthenticationSession().getAuthNote(BeneficiaryOIDCAuthenticatorForm.FIELD_UID);
 
-        // Use Unified ID number in the findPasswordHashAlt query if we are using PDS authenticator.
+        // Use Unified ID number in the findPasswordHashAlt query if we are using beneficiary authenticator.
         if (uid != null && !uid.isEmpty()) {
             param = uid;
             query = queryConfigurations.getFindPasswordHashAlt();

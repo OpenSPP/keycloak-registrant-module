@@ -62,7 +62,7 @@ public class Query {
         return String.format(query, DATABASE);
     }
 
-    public static String getFindByPDSForm() {
+    public static String getFindByBeneficiaryForm() {
         String query = """
             SELECT
                 id,

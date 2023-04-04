@@ -7,38 +7,38 @@ from odoo.addons.component.core import Component
 from odoo.addons.phone_validation.tools import phone_validation
 from passlib.context import CryptContext
 
-from ..models.pds import (
-    PDSBaseIn,
-    PDSUpdatePhoneIn,
-    PDSUpdatePhoneOut,
-    PDSUpdatePaswordIn,
-    PDSUpdatePasswordOut,
+from ..models.oidc import (
+    OIDCBaseIn,
+    OIDCUpdatePhoneIn,
+    OIDCUpdatePhoneOut,
+    OIDCUpdatePaswordIn,
+    OIDCUpdatePasswordOut,
 )
 
 
 _logger = logging.getLogger(__name__)
 
 
-class PDSApiService(Component):
+class OIDCApiService(Component):
     _inherit = "base.rest.service"
-    _name = "pds.rest.service"
-    _usage = "pds"
-    _collection = "base.rest.keycloak.oidc.services"
+    _name = "oidc.rest.service"
+    _usage = "oidc"
+    _collection = "base.rest.keycloak.services"
     _description = """
-        PDS OIDC API Services
+        OIDC API Services
     """
 
     @restapi.method(
         [(["/phone"], "POST")],
-        input_param=PydanticModel(PDSUpdatePhoneIn),
-        output_param=PydanticModel(PDSUpdatePhoneOut),
+        input_param=PydanticModel(OIDCUpdatePhoneIn),
+        output_param=PydanticModel(OIDCUpdatePhoneOut),
         auth="jwt_tamwini",
     )
-    def changePhoneNumber(self, info: PDSUpdatePhoneIn):
+    def changePhoneNumber(self, info: OIDCUpdatePhoneIn):
         """
         Change phone number in res.partner
-        :param info: An instance of the pds info
-        :return: An instance of pds.info
+        :param info: An instance of the OIDC info
+        :return: An instance of OIDC info
         """
         logging.info("v" * 80)
         logging.info("Change Phone number")
@@ -69,9 +69,9 @@ class PDSApiService(Component):
                 phone_updated = g2p_phone_number[0].write(
                     {'phone_no': info.phone_number})
         else:
-            logging.info("PDS parameter is invalid.")
+            logging.info("OIDC parameter is invalid.")
 
-        res = PDSUpdatePhoneOut(
+        res = OIDCUpdatePhoneOut(
             phone_updated=phone_updated,
             group_id=group_id,
             individual_id=individual_id,
@@ -81,15 +81,15 @@ class PDSApiService(Component):
 
     @restapi.method(
         [(["/password"], "POST")],
-        input_param=PydanticModel(PDSUpdatePaswordIn),
-        output_param=PydanticModel(PDSUpdatePasswordOut),
+        input_param=PydanticModel(OIDCUpdatePaswordIn),
+        output_param=PydanticModel(OIDCUpdatePasswordOut),
         auth="jwt_tamwini",
     )
-    def changePassword(self, info: PDSUpdatePaswordIn):
+    def changePassword(self, info: OIDCUpdatePaswordIn):
         """
         Change OIDC password in res.partner
-        :param info: An instance of the pds info
-        :return: An instance of pds.info
+        :param info: An instance of the OIDC info
+        :return: An instance of OIDC info
         """
         logging.info("v" * 80)
         logging.info("Change OIDC password")
@@ -111,9 +111,9 @@ class PDSApiService(Component):
             password_hash = crypt_context.hash(info.password)
             password_updated = partner.write({'oidc_password': password_hash})
         else:
-            logging.info("PDS parameter is invalid.")
+            logging.info("OIDC parameter is invalid.")
 
-        res = PDSUpdatePasswordOut(
+        res = OIDCUpdatePasswordOut(
             password_updated=password_updated,
             group_id=group_id,
             individual_id=individual_id,
@@ -121,7 +121,7 @@ class PDSApiService(Component):
         logging.info("^" * 80)
         return res
 
-    def _find_indvidual(self, info: PDSBaseIn, updating_phone=False):
+    def _find_indvidual(self, info: OIDCBaseIn, updating_phone=False):
         domain = [
             ("id_type_name", "=", "Unified ID"),
             ("id_type_value", "=", info.uid_number),
@@ -136,7 +136,7 @@ class PDSApiService(Component):
 
         return individual
 
-    def _find_group(self, info: PDSBaseIn):
+    def _find_group(self, info: OIDCBaseIn):
         group = self.env["spp.partner.oidc"].search([
             ("username", "=", info.household_number),
         ])
