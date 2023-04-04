@@ -48,8 +48,8 @@ public abstract class BaseOtpAuthenticatorFactory implements AuthenticatorFactor
             new ProviderConfigProperty(LENGTH_FIELD, "Code length", "The number of digits of the generated code.",
                     ProviderConfigProperty.STRING_TYPE, 6),
             new ProviderConfigProperty(TTL_FIELD, "Time-to-live",
-                    "The time to live in seconds for the code to be valid.", ProviderConfigProperty.STRING_TYPE,
-                    "300"),
+                    "The time to live in minutes for the code to be valid.", ProviderConfigProperty.STRING_TYPE,
+                    "5"),
             new ProviderConfigProperty(SIMULATION_FIELD, "Simulation mode",
                     "In simulation mode, the SMS won't be sent, but printed to the server logs",
                     ProviderConfigProperty.BOOLEAN_TYPE, true));

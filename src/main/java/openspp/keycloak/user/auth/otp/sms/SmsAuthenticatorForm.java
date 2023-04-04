@@ -1,5 +1,6 @@
 package openspp.keycloak.user.auth.otp.sms;
 
+import java.util.List;
 import java.util.Locale;
 
 import javax.ws.rs.core.Response;
@@ -11,6 +12,7 @@ import org.keycloak.models.AuthenticatorConfigModel;
 import org.keycloak.models.KeycloakSession;
 import org.keycloak.models.UserModel;
 import org.keycloak.theme.Theme;
+import org.keycloak.theme.beans.MessageFormatterMethod;
 
 import lombok.extern.slf4j.Slf4j;
 import openspp.keycloak.user.auth.otp.base.BaseOtpAuthenticatorForm;
@@ -37,8 +39,11 @@ public class SmsAuthenticatorForm extends BaseOtpAuthenticatorForm {
         try {
             Theme theme = session.theme().getTheme(Theme.Type.LOGIN);
             Locale locale = session.getContext().resolveLocale(user);
+            MessageFormatterMethod mfm = new MessageFormatterMethod(locale, theme.getMessages(locale));
+
             String smsAuthText = theme.getMessages(locale).getProperty("otpAuthText");
-            String smsText = String.format(smsAuthText, code, Math.floorDiv(ttl, 60));
+            List<String> smsTextFormat = List.of(smsAuthText, code, String.valueOf(ttl));
+            String smsText = mfm.exec(smsTextFormat).toString();
 
             SmsServiceFactory.create(context, config.getConfig()).send(mobileNumber, smsText, code, ttl);
 

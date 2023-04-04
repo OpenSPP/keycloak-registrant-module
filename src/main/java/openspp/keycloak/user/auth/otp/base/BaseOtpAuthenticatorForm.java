@@ -32,7 +32,7 @@ public abstract class BaseOtpAuthenticatorForm implements Authenticator {
         String code = OtpUtilities.makeOtpCode(length);
         AuthenticationSessionModel authSession = context.getAuthenticationSession();
         authSession.setAuthNote(CODE_FIELD, code);
-        authSession.setAuthNote(BaseOtpAuthenticatorFactory.TTL_FIELD, Long.toString(System.currentTimeMillis() + (ttl * 1000L)));
+        authSession.setAuthNote(BaseOtpAuthenticatorFactory.TTL_FIELD, Long.toString(System.currentTimeMillis() + (ttl * 60 * 1000L)));
 
         sendOtp(context, code, ttl);
     }
@@ -42,7 +42,7 @@ public abstract class BaseOtpAuthenticatorForm implements Authenticator {
     @Override
     public void action(AuthenticationFlowContext context) {
         MultivaluedMap<String, String> formData = context.getHttpRequest().getDecodedFormParameters();
-        String enteredCode = formData.getFirst(CODE_FIELD);
+        String enteredCode = formData.getFirst(CODE_FIELD).trim();
 
         if (formData.containsKey("resend")) {
             resetOtp(context);

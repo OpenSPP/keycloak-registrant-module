@@ -1,4 +1,5 @@
 <#import "template.ftl" as layout>
+<#include "openspp.ftl">
 <@layout.registrationLayout displayInfo=true; section>
     <#if section = "header">
 		${msg("emailAuthTitle",realm.displayName)}
@@ -9,7 +10,7 @@
                     <label for="code">${msg("otpAuthLabel")}</label>
                 </div>
                 <div class="${properties.kcInputWrapperClass!}">
-                    <input type="text" id="code" name="code" class="${properties.kcInputClass!}" autofocus/>
+                    <input type="text" id="code" name="code" class="${properties.kcInputClass!}" <@rtl/> autofocus/>
                 </div>
             </div>
             <div class="${properties.kcFormGroupClass!} ${properties.kcFormSettingClass!}">
@@ -19,17 +20,17 @@
                     </div>
                 </div>
 
-                <div id="kc-form-buttons" class="${properties.kcFormButtonsClass!}">
-                    <input class="${properties.kcButtonClass!} ${properties.kcButtonPrimaryClass!} ${properties.kcButtonLargeClass!}"
-                        type="submit" value="${msg('doSubmit')}"/>
+                <div id="kc-form-buttons" class="${properties.kcFormButtonsClass!}" <@rtl/>>
+                    <input name="cancel"
+                        class="${properties.kcButtonClass!} ${properties.kcButtonSecondaryClass!} ${properties.kcButtonLargeClass!}"
+                        type="submit" value="${msg('doCancel')}"/>
 
                     <input name="resend"
-                        class="${properties.kcButtonClass!} ${properties.kcButtonPrimaryClass!} ${properties.kcButtonLargeClass!}"
+                        class="${properties.kcButtonClass!} ${properties.kcButtonSecondaryClass!} ${properties.kcButtonLargeClass!}"
                         type="submit" value="${msg('resendOTP')}"/>
 
-                    <input name="cancel"
-                        class="${properties.kcButtonClass!} ${properties.kcButtonPrimaryClass!} ${properties.kcButtonLargeClass!}"
-                        type="submit" value="${msg('doCancel')}"/>
+                    <input class="${properties.kcButtonClass!} ${properties.kcButtonPrimaryClass!} ${properties.kcButtonLargeClass!}"
+                        type="submit" value="${msg('doSubmit')}"/>
                 </div>
             </div>
         </form>
