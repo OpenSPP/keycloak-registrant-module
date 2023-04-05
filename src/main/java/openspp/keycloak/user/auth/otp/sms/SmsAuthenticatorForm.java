@@ -29,6 +29,11 @@ public class SmsAuthenticatorForm extends BaseOtpAuthenticatorForm {
     }
 
     @Override
+    public void createForm(AuthenticationFlowContext context) {
+        context.challenge(context.form().setAttribute("realm", context.getRealm()).createForm(TEMPLATE));
+    }
+
+    @Override
     public void sendOtp(AuthenticationFlowContext context, String code, int ttl) {
         AuthenticatorConfigModel config = context.getAuthenticatorConfig();
         KeycloakSession session = context.getSession();
@@ -47,7 +52,7 @@ public class SmsAuthenticatorForm extends BaseOtpAuthenticatorForm {
 
             SmsServiceFactory.create(context, config.getConfig()).send(mobileNumber, smsText, code, ttl);
 
-            context.challenge(context.form().setAttribute("realm", context.getRealm()).createForm(TEMPLATE));
+            createForm(context);
         } catch (Exception e) {
             log.error("Cannot send SMS OTP", e);
             context.failureChallenge(AuthenticationFlowError.INTERNAL_ERROR,

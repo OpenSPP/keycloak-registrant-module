@@ -33,6 +33,11 @@ public class EmailAuthenticatorForm extends BaseOtpAuthenticatorForm {
     }
 
     @Override
+    public void createForm(AuthenticationFlowContext context) {
+        context.challenge(context.form().setAttribute("realm", context.getRealm()).createForm(TEMPLATE));
+    }
+
+    @Override
     public void sendOtp(AuthenticationFlowContext context, String code, int ttl) {
         KeycloakSession session = context.getSession();
         RealmModel realm = context.getRealm();

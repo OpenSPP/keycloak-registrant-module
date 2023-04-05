@@ -16,26 +16,35 @@ import org.keycloak.models.UserModel;
 import org.keycloak.models.utils.FormMessage;
 import org.keycloak.sessions.AuthenticationSessionModel;
 
+import lombok.extern.slf4j.Slf4j;
 import openspp.keycloak.user.auth.otp.OtpUtilities;
 
 
+@Slf4j
 public abstract class BaseOtpAuthenticatorForm implements Authenticator {
     public static final String CODE_FIELD = "code";
 
     @Override
     public void authenticate(AuthenticationFlowContext context) {
+        AuthenticationSessionModel authSession = context.getAuthenticationSession();
         AuthenticatorConfigModel config = context.getAuthenticatorConfig();
 
         int length = Integer.parseInt(config.getConfig().get(BaseOtpAuthenticatorFactory.LENGTH_FIELD));
         int ttl = Integer.parseInt(config.getConfig().get(BaseOtpAuthenticatorFactory.TTL_FIELD));
 
+        if (authSession.getAuthNote(CODE_FIELD) != null && ttl > System.currentTimeMillis()) {
+            log.info("OTP code exists and still valid, skipping sendOtp");
+            createForm(context);
+            return;
+        }
         String code = OtpUtilities.makeOtpCode(length);
-        AuthenticationSessionModel authSession = context.getAuthenticationSession();
         authSession.setAuthNote(CODE_FIELD, code);
         authSession.setAuthNote(BaseOtpAuthenticatorFactory.TTL_FIELD, Long.toString(System.currentTimeMillis() + (ttl * 60 * 1000L)));
 
         sendOtp(context, code, ttl);
     }
+
+    public abstract void createForm(AuthenticationFlowContext context);
 
     public abstract void sendOtp(AuthenticationFlowContext context, String code, int ttl);
 
@@ -46,6 +55,7 @@ public abstract class BaseOtpAuthenticatorForm implements Authenticator {
 
         if (formData.containsKey("resend")) {
             resetOtp(context);
+            authenticate(context);
             challenge(context, null);
             return;
         }

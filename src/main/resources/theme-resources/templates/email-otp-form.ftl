@@ -4,37 +4,33 @@
     <#if section = "header">
 		${msg("emailAuthTitle",realm.displayName)}
     <#elseif section = "form">
-        <form id="kc-u2f-login-form" class="${properties.kcFormClass!}" action="${url.loginAction}" method="post">
-            <div class="${properties.kcFormGroupClass!}">
-                <div class="${properties.kcLabelWrapperClass!}">
-                    <label for="code">${msg("otpAuthLabel")}</label>
-                </div>
-                <div class="${properties.kcInputWrapperClass!}">
-                    <input type="text" id="code" name="code" class="${properties.kcInputClass!}" <@rtl/> autofocus/>
-                </div>
-            </div>
-            <div class="${properties.kcFormGroupClass!} ${properties.kcFormSettingClass!}">
-                <div id="kc-form-options" class="${properties.kcFormOptionsClass!}">
-                    <div class="${properties.kcFormOptionsWrapperClass!}">
-                        <span><a href="${url.loginUrl}">${kcSanitize(msg("backToLogin"))?no_esc}</a></span>
+        <div id="kc-form">
+            <div id="kc-form-wrapper">
+                <form action="${url.loginAction}" class="${properties.kcFormClass!}" id="kc-u2f-login-form"
+                    method="post">
+                    <div class="${properties.kcFormGroupClass!}">
+                        <label for="code" class="${properties.kcLabelClass!}">${msg("otpAuthLabel")}</label>
+                        <input type="text" id="code" name="code"
+                            class="${properties.kcInputClass!}" <@rtl/> autofocus/>
                     </div>
-                </div>
+                    <div class="${properties.kcFormGroupClass!}">
+                        <div id="kc-form-buttons" class="${properties.kcFormButtonsClass!}" <@rtl/>>
+                            <#--  <input name="cancel"
+                                class="${properties.kcButtonClass!} ${properties.kcButtonSecondaryClass!} ${properties.kcButtonLargeClass!} ${properties.kcButtonBlockClass!}"
+                                type="submit" value="${msg('doCancel')}"/>  -->
 
-                <div id="kc-form-buttons" class="${properties.kcFormButtonsClass!}" <@rtl/>>
-                    <input name="cancel"
-                        class="${properties.kcButtonClass!} ${properties.kcButtonSecondaryClass!} ${properties.kcButtonLargeClass!}"
-                        type="submit" value="${msg('doCancel')}"/>
+                            <input name="resend"
+                                class="${properties.kcButtonClass!} ${properties.kcButtonSecondaryClass!} ${properties.kcButtonLargeClass!} ${properties.kcButtonBlockClass!}"
+                                type="submit" value="${msg('resendOTP')}"/>
 
-                    <input name="resend"
-                        class="${properties.kcButtonClass!} ${properties.kcButtonSecondaryClass!} ${properties.kcButtonLargeClass!}"
-                        type="submit" value="${msg('resendOTP')}"/>
-
-                    <input class="${properties.kcButtonClass!} ${properties.kcButtonPrimaryClass!} ${properties.kcButtonLargeClass!}"
-                        type="submit" value="${msg('doSubmit')}"/>
+                            <input class="${properties.kcButtonClass!} ${properties.kcButtonPrimaryClass!} ${properties.kcButtonLargeClass!} ${properties.kcButtonBlockClass!}"
+                                type="submit" value="${msg('doSubmit')}"/>
+                        </div>
+                    </div>
                 </div>
             </div>
         </form>
-	<#elseif section = "info" >
-		${msg("emailAuthInstruction")}
+	<#--  <#elseif section = "info" >
+		${msg("emailAuthInstruction")}  -->
     </#if>
 </@layout.registrationLayout>

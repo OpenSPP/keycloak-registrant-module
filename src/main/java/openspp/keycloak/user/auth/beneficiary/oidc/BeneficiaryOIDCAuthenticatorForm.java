@@ -1,5 +1,8 @@
 package openspp.keycloak.user.auth.beneficiary.oidc;
 
+import java.util.Hashtable;
+import java.util.Map;
+
 import javax.ws.rs.core.MultivaluedMap;
 import javax.ws.rs.core.Response;
 
@@ -194,6 +197,7 @@ public class BeneficiaryOIDCAuthenticatorForm implements Authenticator {
                 .setExecution(context.getExecution().getId());
         
         MultivaluedMap<String, String> formData = new MultivaluedMapImpl<>();
+        Map<String, String> formDataX = new Hashtable<>();
         
         String[] formFields = {
             FIELD_UID,
@@ -202,15 +206,22 @@ public class BeneficiaryOIDCAuthenticatorForm implements Authenticator {
         };
     
         for (int i=0; i<formFields.length; i++) {
-            if (context.getAuthenticationSession().getAuthNote(formFields[i]) != null) {
+            String fieldData = context.getAuthenticationSession().getAuthNote(formFields[i]);
+            if (fieldData!= null) {
+                // log.info("Field={} Value={}", formFields[i], fieldData);
+                formDataX.put(
+                    formFields[i],
+                    fieldData
+                );
                 formData.add(
                     formFields[i],
-                    context.getAuthenticationSession().getAuthNote(formFields[i])
+                    fieldData
                 );
             }
         }
 
         if (!formData.isEmpty()) {
+            form.setAttribute("formDataX", formDataX);
             form.setFormData(formData);
         }
 
