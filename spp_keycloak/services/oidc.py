@@ -32,7 +32,7 @@ class OIDCApiService(Component):
         [(["/phone"], "POST")],
         input_param=PydanticModel(OIDCUpdatePhoneIn),
         output_param=PydanticModel(OIDCUpdatePhoneOut),
-        auth="jwt_tamwini",
+        auth="jwt_oidc",
     )
     def changePhoneNumber(self, info: OIDCUpdatePhoneIn):
         """
@@ -83,7 +83,7 @@ class OIDCApiService(Component):
         [(["/password"], "POST")],
         input_param=PydanticModel(OIDCUpdatePaswordIn),
         output_param=PydanticModel(OIDCUpdatePasswordOut),
-        auth="jwt_tamwini",
+        auth="jwt_oidc",
     )
     def changePassword(self, info: OIDCUpdatePaswordIn):
         """
