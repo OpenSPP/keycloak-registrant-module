@@ -37,7 +37,7 @@
                         <div id="kc-form-buttons" class="${properties.kcFormButtonsClass!}" <@rtl/>>
                             <input
                                 class="${properties.kcButtonClass!} ${properties.kcButtonPrimaryClass!} ${properties.kcButtonLargeClass!} ${properties.kcButtonBlockClass!}"
-                                type="submit" value="${msg('doSubmit')}" />
+                                type="submit" value="${msg('doLogIn')}" />
                         </div>
                     </div>
                 </form>
