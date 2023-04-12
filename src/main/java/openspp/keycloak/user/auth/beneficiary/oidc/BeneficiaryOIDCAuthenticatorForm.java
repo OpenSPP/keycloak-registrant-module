@@ -1,6 +1,7 @@
 package openspp.keycloak.user.auth.beneficiary.oidc;
 
 import java.util.Hashtable;
+import java.util.List;
 import java.util.Map;
 
 import javax.ws.rs.core.MultivaluedMap;
@@ -19,6 +20,7 @@ import org.keycloak.models.RealmModel;
 import org.keycloak.models.UserCredentialModel;
 import org.keycloak.models.UserModel;
 import org.keycloak.models.utils.FormMessage;
+import org.keycloak.provider.ProviderConfigProperty;
 import org.keycloak.services.ServicesLogger;
 import org.keycloak.services.messages.Messages;
 
@@ -47,15 +49,22 @@ public class BeneficiaryOIDCAuthenticatorForm implements Authenticator {
         FIELD_OTP,
     };
 
-    private final KeycloakSession session;
+    private Map<String, String> configValues;
+
+    private AuthenticatorConfigModel config;
     private final PhoneNumberUtil phoneNumberUtil = PhoneNumberUtil.getInstance();
 
     public BeneficiaryOIDCAuthenticatorForm(KeycloakSession session) {
-        this.session = session;
+    }
+
+    private void getConfig(AuthenticationFlowContext context) {
+        config = context.getAuthenticatorConfig();
+        configValues = config.getConfig();
     }
 
     @Override
     public void action(AuthenticationFlowContext context) {
+        getConfig(context);
         MultivaluedMap<String, String> formData = context.getHttpRequest().getDecodedFormParameters();
         if (formData.containsKey("cancel")) {
             context.cancelLogin();
@@ -74,12 +83,10 @@ public class BeneficiaryOIDCAuthenticatorForm implements Authenticator {
     }
 
     private PhoneNumber parsePhoneNumber(AuthenticationFlowContext context, String phoneNumber) throws NumberParseException {
-        AuthenticatorConfigModel config = context.getAuthenticatorConfig();
         PhoneNumber pn = null;
+        String intPhoneCode = configValues.getOrDefault(BeneficiaryOIDCAuthenticatorFactory.INT_PHONE_CODE_FIELD, null);
 
         // Pre-process phone number format
-        String intPhoneCode = config.getConfig().get(BeneficiaryOIDCAuthenticatorFactory.INT_PHONE_CODE_FIELD);
-
         if (intPhoneCode != null && !intPhoneCode.isEmpty()) {
             intPhoneCode = intPhoneCode.replaceAll("[^0-9]+", "");
             String phoneDigits = phoneNumber.replaceAll("[^0-9]+", "");
@@ -188,6 +195,7 @@ public class BeneficiaryOIDCAuthenticatorForm implements Authenticator {
 
     @Override
     public void authenticate(AuthenticationFlowContext context) {
+        getConfig(context);
         Response challengeResponse = challenge(context, null, null);
         context.challenge(challengeResponse);
     }
@@ -198,6 +206,7 @@ public class BeneficiaryOIDCAuthenticatorForm implements Authenticator {
         
         MultivaluedMap<String, String> formData = new MultivaluedMapImpl<>();
         Map<String, String> formDataX = new Hashtable<>();
+        formDataX.putAll(configValues);
         
         String[] formFields = {
             FIELD_UID,
@@ -209,19 +218,18 @@ public class BeneficiaryOIDCAuthenticatorForm implements Authenticator {
             String fieldData = context.getAuthenticationSession().getAuthNote(formFields[i]);
             if (fieldData!= null) {
                 // log.info("Field={} Value={}", formFields[i], fieldData);
-                formDataX.put(
-                    formFields[i],
-                    fieldData
-                );
-                formData.add(
-                    formFields[i],
-                    fieldData
-                );
+                // Remove international code from phoneNumber.
+                String intPhoneCode = configValues.getOrDefault(BeneficiaryOIDCAuthenticatorFactory.INT_PHONE_CODE_FIELD, null);
+                if (intPhoneCode != null && formFields[i] == FIELD_PHONE_NUMBER) {
+                    fieldData = fieldData.replace(intPhoneCode, "");
+                }
+                formDataX.put(formFields[i], fieldData);
+                formData.add(formFields[i], fieldData);
             }
         }
 
+        form.setAttribute("formDataX", formDataX);
         if (!formData.isEmpty()) {
-            form.setAttribute("formDataX", formDataX);
             form.setFormData(formData);
         }
 

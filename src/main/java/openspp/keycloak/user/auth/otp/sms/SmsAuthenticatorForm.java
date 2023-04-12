@@ -67,7 +67,8 @@ public class SmsAuthenticatorForm extends BaseOtpAuthenticatorForm {
             // expired
             log.debug("OTP code expired");
             context.failureChallenge(AuthenticationFlowError.EXPIRED_CODE,
-                    context.form().setError("otpAuthCodeExpired").createErrorPage(Response.Status.BAD_REQUEST));
+                    context.form().setAttribute("realm", context.getRealm())
+                            .setError("otpAuthCodeExpired").createForm(TEMPLATE));
         } else {
             // valid
             log.debug("OTP success");

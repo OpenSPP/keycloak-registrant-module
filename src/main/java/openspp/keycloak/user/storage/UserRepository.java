@@ -51,7 +51,7 @@ public class UserRepository {
                 if (pageable != null) {
                     query = Paginator.getPagableQuery(query, pageable, queryConfigurations.getJDBC());
                 }
-                log.info("Query: {} params: {} ", query, Arrays.toString(params));
+                log.debug("Query: {} params: {} ", query, Arrays.toString(params));
                 try (PreparedStatement statement = c.prepareStatement(query)) {
                     if (params != null) {
                         int parameterCount = statement.getParameterMetaData().getParameterCount();

@@ -18,6 +18,7 @@ public class BeneficiaryOIDCAuthenticatorFactory implements AuthenticatorFactory
     public static final String PROVIDER_ID = "ben-oidc-authenticator";
 
     public static final String INT_PHONE_CODE_FIELD = "intPhoneCode";
+    public static final String SAMPLE_PHONE_NUMBER_FIELD = "samplePhoneNumber";
 
     @Override
     public String getId() {
@@ -59,7 +60,10 @@ public class BeneficiaryOIDCAuthenticatorFactory implements AuthenticatorFactory
         return List.of(
             // TODO: Make a list of standard international phone code with google/libphonenumber.
             new ProviderConfigProperty(INT_PHONE_CODE_FIELD, "International Country Phone Code", "The internation phone code for the country.",
-                    ProviderConfigProperty.STRING_TYPE, "+964"));
+                    ProviderConfigProperty.STRING_TYPE, "+964"),
+            new ProviderConfigProperty(SAMPLE_PHONE_NUMBER_FIELD, "Sample Phone Number", "The sample phone number display as placeholder in the phone number field.",
+                    ProviderConfigProperty.STRING_TYPE, "712 345 6789")
+        );
     }
 
     @Override

@@ -32,8 +32,8 @@ public abstract class BaseOtpAuthenticatorForm implements Authenticator {
         int length = Integer.parseInt(config.getConfig().get(BaseOtpAuthenticatorFactory.LENGTH_FIELD));
         int ttl = Integer.parseInt(config.getConfig().get(BaseOtpAuthenticatorFactory.TTL_FIELD));
 
-        if (authSession.getAuthNote(CODE_FIELD) != null && ttl > System.currentTimeMillis()) {
-            log.info("OTP code exists and still valid, skipping sendOtp");
+        if (authSession.getAuthNote(CODE_FIELD) != null) {
+            log.info("OTP code already sent, skipping");
             createForm(context);
             return;
         }
