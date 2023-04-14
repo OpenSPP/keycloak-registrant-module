@@ -24,7 +24,7 @@ public class SmsServiceFactory {
             KeycloakSession session = context.getSession();
             RealmModel realm = context.getRealm();
             String realmName = realm.getDisplayName() != null ? realm.getDisplayName() : realm.getName();
-            return (phoneNumber, message, code, ttl) -> {
+            return (phoneNumber, message, code, length, ttl) -> {
                 log.warn("v".repeat(80));
                 log.warn(
                     "SIMULATION MODE: Sending SMS OTP to {} with text: {}",
@@ -35,8 +35,9 @@ public class SmsServiceFactory {
                 if (email != null && !email.isEmpty()) {
                     List<Object> subjectParams = List.of(realmName);
                     Map<String, Object> mailBodyAttributes = new HashMap<>();
+                    mailBodyAttributes.put(BaseOtpAuthenticatorFactory.LENGTH_FIELD, length);
                     mailBodyAttributes.put(BaseOtpAuthenticatorForm.CODE_FIELD, code);
-                    mailBodyAttributes.put(BaseOtpAuthenticatorFactory.TTL_FIELD, Math.floorDiv(ttl, 60));
+                    mailBodyAttributes.put(BaseOtpAuthenticatorFactory.TTL_FIELD, ttl);
                     EmailTemplateProvider emailProvider = session.getProvider(EmailTemplateProvider.class);
                     emailProvider.setRealm(realm);
                     emailProvider.setUser(context.getUser());

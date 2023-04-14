@@ -47,7 +47,8 @@
 
                     <div class="${properties.kcFormGroupClass!}">
                         <div id="kc-form-buttons" class="${properties.kcFormButtonsClass!}" <@rtl/>>
-                            <input class="${properties.kcButtonClass!} ${properties.kcButtonPrimaryClass!} ${properties.kcButtonLargeClass!} ${properties.kcButtonBlockClass!}"
+                            <input name="submit" disabled
+                                class="${properties.kcButtonClass!} ${properties.kcButtonPrimaryClass!} ${properties.kcButtonLargeClass!} ${properties.kcButtonBlockClass!}"
                                 type="submit" value="${msg('doLogIn')}" />
                         </div>
                     </div>
@@ -60,7 +61,5 @@
                 'invalidInput': '${msg("invalidInput")}',
             };
         </script>
-    <#--  <#elseif section="info">
-        ${msg("benOIDCAuthInstruction")}  -->
     </#if>
 </@layout.registrationLayout>

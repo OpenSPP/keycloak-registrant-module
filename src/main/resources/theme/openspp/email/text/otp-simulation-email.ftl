@@ -1,2 +1,2 @@
 <#ftl output_format="plainText">
-${msg("emailOTPBody", code)}
+${msg("otpAuthText", length, code, ttl)}

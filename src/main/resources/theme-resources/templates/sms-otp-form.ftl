@@ -1,5 +1,5 @@
 <#import "template.ftl" as layout>
-<#include "openspp.ftl">
+<#include "macros.ftl">
 <@layout.registrationLayout displayInfo=true; section>
     <#if section = "header">
         ${msg("smsAuthTitle",realm.displayName)}
@@ -9,28 +9,32 @@
                 <form action="${url.loginAction}" class="${properties.kcFormClass!}" id="kc-u2f-login-form"
                     method="post">
                     <div class="${properties.kcFormGroupClass!}">
-                        <label for="code" class="${properties.kcLabelClass!}">${msg("otpAuthLabel")}</label>
+                        <label for="code" class="${properties.kcLabelClass!}">${msg("otpAuthLabel", formDataX['length'])}</label>
                         <input type="text" id="code" name="code"
+                            required-submit data-validate-msg=""
+                            pattern="\d+" inputmode="numeric"
+                            minlength="${formDataX['length']}" maxlength="${formDataX['length']}"
                             class="${properties.kcInputClass!}" <@rtl/> autofocus/>
                     </div>
                     <div class="${properties.kcFormGroupClass!}">
                         <div id="kc-form-buttons" class="${properties.kcFormButtonsClass!}" <@rtl/>>
-                            <#--  <input name="cancel"
-                                class="${properties.kcButtonClass!} ${properties.kcButtonSecondaryClass!} ${properties.kcButtonLargeClass!} ${properties.kcButtonBlockClass!}"
-                                type="submit" value="${msg('doCancel')}"/>  -->
+                            <input name="submit" class="${properties.kcButtonClass!} ${properties.kcButtonPrimaryClass!} ${properties.kcButtonLargeClass!} ${properties.kcButtonBlockClass!}"
+                                type="submit" value="${msg('doSubmit')}" disabled/>
 
-                            <input name="resend"
+                            <input name="resend" ${(formDataX['resendOTPStatus'])!''}
                                 class="${properties.kcButtonClass!} ${properties.kcButtonSecondaryClass!} ${properties.kcButtonLargeClass!} ${properties.kcButtonBlockClass!}"
+                                data-ttl="${(formDataX['ttl'])!''}" data-resend-time="${(formDataX['resendTime'])!''}"
                                 type="submit" value="${msg('resendOTP')}"/>
-
-                            <input class="${properties.kcButtonClass!} ${properties.kcButtonPrimaryClass!} ${properties.kcButtonLargeClass!} ${properties.kcButtonBlockClass!}"
-                                type="submit" value="${msg('doSubmit')}"/>
                         </div>
                     </div>
                 </div>
             </div>
         </form>
-    <#--  <#elseif section = "info" >
-        ${msg("smsAuthInstruction")}  -->
+        <script>
+            var MESSAGES = {
+                'required': '${msg("required")}',
+                'invalidInput': '${msg("invalidInput")}',
+            };
+        </script>
     </#if>
 </@layout.registrationLayout>

@@ -1,7 +1,6 @@
 package openspp.keycloak.user.auth.beneficiary.oidc;
 
 import java.util.Hashtable;
-import java.util.List;
 import java.util.Map;
 
 import javax.ws.rs.core.MultivaluedMap;
@@ -20,7 +19,6 @@ import org.keycloak.models.RealmModel;
 import org.keycloak.models.UserCredentialModel;
 import org.keycloak.models.UserModel;
 import org.keycloak.models.utils.FormMessage;
-import org.keycloak.provider.ProviderConfigProperty;
 import org.keycloak.services.ServicesLogger;
 import org.keycloak.services.messages.Messages;
 
@@ -39,14 +37,12 @@ public class BeneficiaryOIDCAuthenticatorForm implements Authenticator {
     public static final String FIELD_UID = "uid";
     public static final String FIELD_HOUSEHOLD_NUMBER = "household_number";
     public static final String FIELD_PHONE_NUMBER = "phone_number";
-    public static final String FIELD_OTP = "otp";
     public static final String FIELD_PASSWORD = "password";
 
     public static final String[] FIELDS = {
         FIELD_UID,
         FIELD_HOUSEHOLD_NUMBER,
         FIELD_PHONE_NUMBER,
-        FIELD_OTP,
     };
 
     private Map<String, String> configValues;
@@ -77,9 +73,10 @@ public class BeneficiaryOIDCAuthenticatorForm implements Authenticator {
         context.success();
         // Remove auth notes after validate credentials
         log.debug("AuthNote cleanup.");
-        for (int i=0; i<FIELDS.length; i++) {
-            context.getAuthenticationSession().removeAuthNote(FIELDS[i]);
-        }
+        context.getAuthenticationSession().removeAuthNote(FIELD_PASSWORD);
+        // for (int i=0; i<FIELDS.length; i++) {
+        //     context.getAuthenticationSession().removeAuthNote(FIELDS[i]);
+        // }
     }
 
     private PhoneNumber parsePhoneNumber(AuthenticationFlowContext context, String phoneNumber) throws NumberParseException {

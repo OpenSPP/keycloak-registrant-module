@@ -33,12 +33,7 @@ public class EmailAuthenticatorForm extends BaseOtpAuthenticatorForm {
     }
 
     @Override
-    public void createForm(AuthenticationFlowContext context) {
-        context.challenge(context.form().setAttribute("realm", context.getRealm()).createForm(TEMPLATE));
-    }
-
-    @Override
-    public void sendOtp(AuthenticationFlowContext context, String code, int ttl) {
+    public void sendOtp(AuthenticationFlowContext context, String code, int length, int ttl) {
         KeycloakSession session = context.getSession();
         RealmModel realm = context.getRealm();
         UserModel user = context.getUser();
@@ -53,8 +48,9 @@ public class EmailAuthenticatorForm extends BaseOtpAuthenticatorForm {
 
         Map<String, Object> mailBodyAttributes = new HashMap<>();
         mailBodyAttributes.put("username", user.getUsername());
+        mailBodyAttributes.put(BaseOtpAuthenticatorFactory.LENGTH_FIELD, length);
         mailBodyAttributes.put(CODE_FIELD, code);
-        mailBodyAttributes.put(BaseOtpAuthenticatorFactory.TTL_FIELD, Math.floorDiv(ttl, 60));
+        mailBodyAttributes.put(BaseOtpAuthenticatorFactory.TTL_FIELD, ttl);
 
         String realmName = realm.getDisplayName() != null ? realm.getDisplayName() : realm.getName();
         List<Object> subjectParams = List.of(realmName);
@@ -71,7 +67,7 @@ public class EmailAuthenticatorForm extends BaseOtpAuthenticatorForm {
                 user.getUsername()
             );
             context.failureChallenge(AuthenticationFlowError.INTERNAL_ERROR,
-                    context.form().setError("emailAuthEmailNotSent", e.getMessage())
+                    createForm(context, null).setError("emailAuthEmailNotSent", e.getMessage())
                             .createErrorPage(Response.Status.INTERNAL_SERVER_ERROR));
         }
     }
@@ -81,7 +77,7 @@ public class EmailAuthenticatorForm extends BaseOtpAuthenticatorForm {
         if (Long.parseLong(ttl) < System.currentTimeMillis()) {
             // expired
             context.failureChallenge(AuthenticationFlowError.EXPIRED_CODE,
-                    context.form().setError("otpAuthCodeExpired").createErrorPage(Response.Status.BAD_REQUEST));
+                    createForm(context, null).setError("otpAuthCodeExpired").createErrorPage(Response.Status.BAD_REQUEST));
         } else {
             // valid
             context.success();
@@ -93,7 +89,7 @@ public class EmailAuthenticatorForm extends BaseOtpAuthenticatorForm {
         AuthenticationExecutionModel execution = context.getExecution();
         if (execution.isRequired()) {
             context.failureChallenge(AuthenticationFlowError.INVALID_CREDENTIALS,
-                    context.form().setAttribute("realm", context.getRealm())
+                    createForm(context, null).setAttribute("realm", context.getRealm())
                             .setError("otpAuthCodeInvalid").createForm(TEMPLATE));
         } else if (execution.isConditional() || execution.isAlternative()) {
             context.attempted();

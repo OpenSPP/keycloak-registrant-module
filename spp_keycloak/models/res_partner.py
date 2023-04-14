@@ -28,6 +28,7 @@ class ResPartnerOIDC(models.Model):
     id_type_value = fields.Char(string='ID Type Value', required=False,)
     company_name = fields.Integer(string="Company Name", required=False)
     is_group = fields.Boolean(string="Is Group", required=False)
+    active_group = fields.Many2one(comodel_name="res_partner", required=False)
     title = fields.Char(string="Title", required=False)
     lang = fields.Char(string="Lang", required=False)
     tz = fields.Char(string="Time Zone", required=False)
@@ -51,6 +52,7 @@ class ResPartnerOIDC(models.Model):
                 '' AS first_name,
                 '' AS last_name,
                 p.is_group,
+                p.active_group,
                 p.parent_id,
                 g2p_group_kind.id AS kind_id,
                 g2p_group_kind.name AS kind_name,

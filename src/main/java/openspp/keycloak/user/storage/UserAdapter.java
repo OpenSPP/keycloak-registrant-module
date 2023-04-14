@@ -134,6 +134,10 @@ public class UserAdapter extends AbstractUserAdapterFederatedStorage {
         return getFirstAttribute("is_group").equals("t");
     }
 
+    public String getActiveGroup() {
+        return getFirstAttribute("active_group");
+    }
+
     @Override
     public void setUsername(String username) {
         this.username = username;

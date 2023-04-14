@@ -10,13 +10,14 @@ import org.keycloak.authentication.AuthenticationFlowError;
 import org.keycloak.models.AuthenticationExecutionModel;
 import org.keycloak.models.AuthenticatorConfigModel;
 import org.keycloak.models.KeycloakSession;
-import org.keycloak.models.UserModel;
 import org.keycloak.theme.Theme;
 import org.keycloak.theme.beans.MessageFormatterMethod;
 
 import lombok.extern.slf4j.Slf4j;
+import openspp.keycloak.user.auth.beneficiary.oidc.BeneficiaryOIDCAuthenticatorForm;
 import openspp.keycloak.user.auth.otp.base.BaseOtpAuthenticatorForm;
 import openspp.keycloak.user.auth.otp.sms.service.SmsServiceFactory;
+import openspp.keycloak.user.storage.UserAdapter;
 
 
 @Slf4j
@@ -29,17 +30,19 @@ public class SmsAuthenticatorForm extends BaseOtpAuthenticatorForm {
     }
 
     @Override
-    public void createForm(AuthenticationFlowContext context) {
-        context.challenge(context.form().setAttribute("realm", context.getRealm()).createForm(TEMPLATE));
-    }
-
-    @Override
-    public void sendOtp(AuthenticationFlowContext context, String code, int ttl) {
+    public void sendOtp(AuthenticationFlowContext context, String code, int length, int ttl) {
         AuthenticatorConfigModel config = context.getAuthenticatorConfig();
         KeycloakSession session = context.getSession();
-        UserModel user = context.getUser();
+        UserAdapter user = (UserAdapter) context.getUser();
 
-        String mobileNumber = user.getFirstAttribute("mobile_number");
+        String phoneNumber = user.getPhoneNumber();
+        log.debug("Phone number from user attribute: {}", phoneNumber);
+
+        if (phoneNumber == null) {
+            // Get phone number from AuthNote
+            phoneNumber = context.getAuthenticationSession().getAuthNote(BeneficiaryOIDCAuthenticatorForm.FIELD_PHONE_NUMBER);
+            log.debug("Phone number AuthNote: {}", phoneNumber);
+        }
 
         try {
             Theme theme = session.theme().getTheme(Theme.Type.LOGIN);
@@ -47,16 +50,16 @@ public class SmsAuthenticatorForm extends BaseOtpAuthenticatorForm {
             MessageFormatterMethod mfm = new MessageFormatterMethod(locale, theme.getMessages(locale));
 
             String smsAuthText = theme.getMessages(locale).getProperty("otpAuthText");
-            List<String> smsTextFormat = List.of(smsAuthText, code, String.valueOf(ttl));
+            List<String> smsTextFormat = List.of(smsAuthText, String.valueOf(length), code, String.valueOf(ttl));
             String smsText = mfm.exec(smsTextFormat).toString();
 
-            SmsServiceFactory.create(context, config.getConfig()).send(mobileNumber, smsText, code, ttl);
+            SmsServiceFactory.create(context, config.getConfig()).send(phoneNumber, smsText, code, length, ttl);
 
-            createForm(context);
+            challenge(context, null);
         } catch (Exception e) {
             log.error("Cannot send SMS OTP", e);
             context.failureChallenge(AuthenticationFlowError.INTERNAL_ERROR,
-                    context.form().setError("smsAuthSmsNotSent", e.getMessage())
+                    createForm(context, null).setError("smsAuthSmsNotSent", e.getMessage())
                             .createErrorPage(Response.Status.INTERNAL_SERVER_ERROR));
         }
     }
@@ -67,7 +70,7 @@ public class SmsAuthenticatorForm extends BaseOtpAuthenticatorForm {
             // expired
             log.debug("OTP code expired");
             context.failureChallenge(AuthenticationFlowError.EXPIRED_CODE,
-                    context.form().setAttribute("realm", context.getRealm())
+                    createForm(context, null).setAttribute("realm", context.getRealm())
                             .setError("otpAuthCodeExpired").createForm(TEMPLATE));
         } else {
             // valid
@@ -82,7 +85,7 @@ public class SmsAuthenticatorForm extends BaseOtpAuthenticatorForm {
         if (execution.isRequired()) {
             log.debug("OTP code is invalid");
             context.failureChallenge(AuthenticationFlowError.INVALID_CREDENTIALS,
-                    context.form().setAttribute("realm", context.getRealm())
+                    createForm(context, null).setAttribute("realm", context.getRealm())
                             .setError("otpAuthCodeInvalid").createForm(TEMPLATE));
         } else if (execution.isConditional() || execution.isAlternative()) {
             context.attempted();

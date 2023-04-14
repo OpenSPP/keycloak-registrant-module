@@ -20,7 +20,8 @@ public class Query {
                 phone,
                 first_name,
                 last_name,
-                full_name
+                full_name,
+                active_group
             FROM %s
         """;
         return String.format(query, DATABASE);
@@ -36,7 +37,8 @@ public class Query {
                 phone,
                 first_name,
                 last_name,
-                full_name
+                full_name,
+                active_group
             FROM %s
             WHERE
                 \"id\" = ? 
@@ -54,7 +56,8 @@ public class Query {
                 phone,
                 first_name,
                 last_name,
-                full_name
+                full_name,
+                active_group
             FROM %s
             WHERE
                 \"username\" = ? 
@@ -74,6 +77,7 @@ public class Query {
                 last_name,
                 full_name,
                 is_group,
+                active_group,
                 kind_name,
                 id_type_name,
                 id_type_value
@@ -95,7 +99,8 @@ public class Query {
                 phone,
                 first_name,
                 last_name,
-                full_name
+                full_name,
+                active_group
             FROM %s
             WHERE
                 \"username\" ILIKE (?) or \"email\" ILIKE (?) or \"full_name\" ILIKE (?)

@@ -1,5 +1,5 @@
 <#import "template.ftl" as layout>
-<#include "openspp.ftl">
+<#include "macros.ftl">
 <@layout.registrationLayout displayInfo=true; section>
     <#if section = "header">
 		${msg("emailAuthTitle",realm.displayName)}
@@ -15,22 +15,17 @@
                     </div>
                     <div class="${properties.kcFormGroupClass!}">
                         <div id="kc-form-buttons" class="${properties.kcFormButtonsClass!}" <@rtl/>>
-                            <#--  <input name="cancel"
-                                class="${properties.kcButtonClass!} ${properties.kcButtonSecondaryClass!} ${properties.kcButtonLargeClass!} ${properties.kcButtonBlockClass!}"
-                                type="submit" value="${msg('doCancel')}"/>  -->
+                            <input name="submit" class="${properties.kcButtonClass!} ${properties.kcButtonPrimaryClass!} ${properties.kcButtonLargeClass!} ${properties.kcButtonBlockClass!}"
+                                type="submit" value="${msg('doSubmit')}" disabled/>
 
-                            <input name="resend"
+                            <input name="resend" ${(formDataX['resendOTPStatus'])!''}
                                 class="${properties.kcButtonClass!} ${properties.kcButtonSecondaryClass!} ${properties.kcButtonLargeClass!} ${properties.kcButtonBlockClass!}"
+                                data-ttl="${(formDataX['ttl'])!''}" data-resend-time="${(formDataX['resendTime'])!''}"
                                 type="submit" value="${msg('resendOTP')}"/>
-
-                            <input class="${properties.kcButtonClass!} ${properties.kcButtonPrimaryClass!} ${properties.kcButtonLargeClass!} ${properties.kcButtonBlockClass!}"
-                                type="submit" value="${msg('doSubmit')}"/>
                         </div>
                     </div>
                 </div>
             </div>
         </form>
-	<#--  <#elseif section = "info" >
-		${msg("emailAuthInstruction")}  -->
     </#if>
 </@layout.registrationLayout>

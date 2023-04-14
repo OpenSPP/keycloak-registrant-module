@@ -26,7 +26,12 @@ public class AwsSmsService implements SmsService {
     }
 
     @Override
-    public void send(String phoneNumber, String message, String code, int ttl) {
+    public void send(String phoneNumber, String message, String code, int length, int ttl) {
+        log.debug("v".repeat(80));
+        log.debug(
+            "AWS SNS: Sending SMS OTP to {}",
+            phoneNumber
+        );
         Map<String, MessageAttributeValue> messageAttributes = new HashMap<>();
         messageAttributes.put(
             "AWS.SNS.SMS.SenderID",
@@ -54,5 +59,6 @@ public class AwsSmsService implements SmsService {
             response.messageId(),
             response.sdkHttpResponse().statusCode()
         );
+        log.debug("^".repeat(80));
     }
 }
