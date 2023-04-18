@@ -13,13 +13,14 @@ class ResPartnerOIDC(models.Model):
 
     oidc_password = fields.Char(string="OIDC password", required=False)
 
+
 class ResPartnerOIDC(models.Model):
     _name = "spp.partner.oidc"
     _auto = False
 
     id = fields.Many2one(comodel_name='res.partner', string='Partner')
     username = fields.Char(string="Username", required=False)
-    fullname = fields.Char(string="Full Name", required=False)
+    full_name = fields.Char(string="Full Name", required=False)
     parent_id = fields.Integer(string="Parent ID", required=False)
     kind_id = fields.Many2one(comodel_name='g2p.group.kind', string='Kind ID')
     kind_name = fields.Char(string='Kind Name', required=False)
