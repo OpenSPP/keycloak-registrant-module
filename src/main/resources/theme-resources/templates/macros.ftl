@@ -1,4 +1,5 @@
 <#macro if if then else=""><#if if>${then}<#else>${else}</#if></#macro>
+<#macro ifrtl then else=""><#if locale.currentLanguageTag == 'ar' || locale.currentLanguageTag=='ku'>${then}<#else>${else}</#if></#macro>
 <#macro rtl><#if locale.currentLanguageTag == 'ar' || locale.currentLanguageTag=='ku'>dir="rtl"</#if></#macro>
 <#macro lv v>
 <pre>
