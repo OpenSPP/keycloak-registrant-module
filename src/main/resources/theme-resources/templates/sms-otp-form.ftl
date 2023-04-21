@@ -11,8 +11,8 @@
                     <div class="${properties.kcFormGroupClass!}">
                         <label for="code" class="${properties.kcLabelClass!}">${msg("otpAuthLabel", formDataX['length'])}</label>
                         <input type="text" id="code" name="code"
-                            required-submit data-validate-msg=""
-                            pattern="\d+" inputmode="numeric"
+                            required data-validate-msg=""
+                            inputmode="numeric" pattern="\d{${formDataX['length']}}"
                             minlength="${formDataX['length']}" maxlength="${formDataX['length']}"
                             class="${properties.kcInputClass!}" <@rtl/> autofocus/>
                     </div>
@@ -23,7 +23,7 @@
 
                             <input name="resend" ${(formDataX['resendOTPStatus'])!''}
                                 class="${properties.kcButtonClass!} ${properties.kcButtonSecondaryClass!} ${properties.kcButtonLargeClass!} ${properties.kcButtonBlockClass!}"
-                                data-ttl="${(formDataX['ttl'])!''}" data-resend-time="${(formDataX['resendTime'])!''}"
+                                data-ttl="${(formDataX['ttl'])!''}" data-resend-time="${(formDataX['resendTime'])!''}" disabled
                                 type="submit" value="${msg('resendOTP')}"/>
                         </div>
                     </div>
