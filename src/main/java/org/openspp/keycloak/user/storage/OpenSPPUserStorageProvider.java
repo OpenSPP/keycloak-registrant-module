@@ -82,7 +82,8 @@ public class OpenSPPUserStorageProvider implements UserStorageProvider,
             }
 
             // TODO: Check all (or a parametered list of) attributes fetched from the DB.
-            if (!java.util.Objects.equals(user.getUsername(), dbUser.getUsername())
+            if (!java.util.Objects.equals(user.getId(), dbUser.getId())
+                    || !java.util.Objects.equals(user.getUsername(), dbUser.getUsername())
                     || !java.util.Objects.equals(user.getEmail(), dbUser.getEmail())) {
                 ((CachedUserModel) user).invalidate();
             }

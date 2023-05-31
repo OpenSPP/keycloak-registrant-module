@@ -33,6 +33,7 @@ class OIDCApiService(Component):
 
     def _find_indvidual(self, info: OIDCBaseIn, updating_phone=False):
         domain = [
+            ("group_membership_kind_name", "=", "Head"),
             ("id_type_name", "=", "Unified ID"),
             ("id_type_value", "=", info.uid_number),
         ]

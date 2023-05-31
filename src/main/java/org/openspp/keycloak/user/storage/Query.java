@@ -41,7 +41,7 @@ public class Query {
                 active_group
             FROM %s
             WHERE
-                \"id\" = ? 
+                \"id\" = ?
         """;
         return String.format(query, DATABASE);
     }
@@ -60,7 +60,7 @@ public class Query {
                 active_group
             FROM %s
             WHERE
-                \"username\" = ? 
+                \"username\" = ?
         """;
         return String.format(query, DATABASE);
     }
@@ -80,11 +80,19 @@ public class Query {
                 active_group,
                 kind_name,
                 id_type_name,
-                id_type_value
+                id_type_value,
+                group_membership_kind_name,
+                group_membership_is_ended
             FROM %s
             WHERE
                 \"username\" = ? OR
-                (\"id_type_name\" = 'Unified ID' AND \"id_type_value\" = ? AND \"phone\" = ?)
+                (
+                    \"group_membership_is_ended\" = false AND
+                    \"group_membership_kind_name\" = 'Head' AND
+                    \"id_type_name\" = 'Unified ID' AND
+                    \"id_type_value\" = ? AND
+                    \"phone\" = ?
+                )
         """;
         return String.format(query, DATABASE);
     }
@@ -110,14 +118,14 @@ public class Query {
 
     public static String getFindPasswordHash() {
         String query = """
-            SELECT password FROM %s WHERE \"username\" = ? 
+            SELECT password FROM %s WHERE \"username\" = ?
         """;
         return String.format(query, DATABASE);
     }
 
     public static String getFindPasswordHashAlt() {
         String query = """
-            SELECT password FROM %s WHERE \"id_type_value\" = ? 
+            SELECT password FROM %s WHERE \"id_type_value\" = ?
         """;
         return String.format(query, DATABASE);
     }
