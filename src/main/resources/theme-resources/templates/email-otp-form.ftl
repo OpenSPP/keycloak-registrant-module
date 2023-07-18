@@ -1,39 +1,40 @@
 <#import "template.ftl" as layout>
+<#include "macros.ftl">
 <@layout.registrationLayout displayInfo=true; section>
     <#if section = "header">
 		${msg("emailAuthTitle",realm.displayName)}
     <#elseif section = "form">
-        <form id="kc-u2f-login-form" class="${properties.kcFormClass!}" action="${url.loginAction}" method="post">
-            <div class="${properties.kcFormGroupClass!}">
-                <div class="${properties.kcLabelWrapperClass!}">
-                    <label for="code">${msg("otpAuthLabel")}</label>
-                </div>
-                <div class="${properties.kcInputWrapperClass!}">
-                    <input type="text" id="code" name="code" class="${properties.kcInputClass!}" autofocus/>
-                </div>
-            </div>
-            <div class="${properties.kcFormGroupClass!} ${properties.kcFormSettingClass!}">
-                <div id="kc-form-options" class="${properties.kcFormOptionsClass!}">
-                    <div class="${properties.kcFormOptionsWrapperClass!}">
-                        <span><a href="${url.loginUrl}">${kcSanitize(msg("backToLogin"))?no_esc}</a></span>
+        <div id="kc-form">
+            <div id="kc-form-wrapper">
+                <form action="${url.loginAction}" class="${properties.kcFormClass!}" id="kc-u2f-login-form"
+                    method="post">
+                    <div class="${properties.kcFormGroupClass!}">
+                        <label for="code" class="${properties.kcLabelClass!}">${msg("otpAuthLabel", formDataX['length'])}</label>
+                        <input type="text" id="code" name="code"
+                            required data-validate-msg=""
+                            inputmode="numeric" pattern="\d{${formDataX['length']}}"
+                            minlength="${formDataX['length']}" maxlength="${formDataX['length']}"
+                            class="${properties.kcInputClass!}" <@rtl/> autofocus/>
                     </div>
-                </div>
+                    <div class="${properties.kcFormGroupClass!}">
+                        <div id="kc-form-buttons" class="${properties.kcFormButtonsClass!}" <@rtl/>>
+                            <input name="submit" class="${properties.kcButtonClass!} ${properties.kcButtonPrimaryClass!} ${properties.kcButtonLargeClass!} ${properties.kcButtonBlockClass!}"
+                                type="submit" value="${msg('doSubmit')}" disabled/>
 
-                <div id="kc-form-buttons" class="${properties.kcFormButtonsClass!}">
-                    <input class="${properties.kcButtonClass!} ${properties.kcButtonPrimaryClass!} ${properties.kcButtonLargeClass!}"
-                        type="submit" value="${msg('doSubmit')}"/>
-
-                    <input name="resend"
-                        class="${properties.kcButtonClass!} ${properties.kcButtonPrimaryClass!} ${properties.kcButtonLargeClass!}"
-                        type="submit" value="${msg('resendOTP')}"/>
-
-                    <input name="cancel"
-                        class="${properties.kcButtonClass!} ${properties.kcButtonPrimaryClass!} ${properties.kcButtonLargeClass!}"
-                        type="submit" value="${msg('doCancel')}"/>
+                            <input name="resend" ${(formDataX['resendOTPStatus'])!''}
+                                class="${properties.kcButtonClass!} ${properties.kcButtonSecondaryClass!} ${properties.kcButtonLargeClass!} ${properties.kcButtonBlockClass!}"
+                                data-ttl="${(formDataX['ttl'])!''}" data-resend-time="${(formDataX['resendTime'])!''}" disabled
+                                type="submit" value="${msg('resendOTP')}"/>
+                        </div>
+                    </div>
                 </div>
             </div>
         </form>
-	<#elseif section = "info" >
-		${msg("emailAuthInstruction")}
+        <script>
+            var MESSAGES = {
+                'required': '${msg("required")}',
+                'invalidInput': '${msg("invalidInput")}',
+            };
+        </script>
     </#if>
 </@layout.registrationLayout>

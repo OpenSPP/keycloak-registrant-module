@@ -30,10 +30,16 @@ class OIDCBaseIn(NaiveOrmModel):
             raise ValueError("Phone number must not empty")
         return v
 
+
 class OIDCUpdatePhoneIn(OIDCBaseIn):
     pass
 
-class OIDCUpdatePaswordIn(OIDCBaseIn):
+
+class OIDCUpdatePasswordIn(OIDCBaseIn):
+    password: str
+
+
+class OIDCVerifyPasswordIn(OIDCBaseIn):
     password: str
 
 
@@ -48,3 +54,7 @@ class OIDCUpdatePhoneOut(OIDCBaseOut):
 
 class OIDCUpdatePasswordOut(OIDCBaseOut):
     password_updated: bool = False
+
+
+class OIDCVerifyPasswordOut(OIDCBaseOut):
+    password_verified: bool = False

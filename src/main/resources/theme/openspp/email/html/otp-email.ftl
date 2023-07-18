@@ -1,5 +1,5 @@
 <html>
 <body>
-${kcSanitize(msg("emailOTPBody", code))?no_esc}
+${kcSanitize(msg("otpAuthText", length, code, ttl))?no_esc}
 </body>
 </html>

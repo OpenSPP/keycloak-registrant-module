@@ -34,6 +34,8 @@ Features:
 2. Add step
 3. Search for Beneficiary Authentication and add to the flow
 4. Select `Requirement` as `Require`
+3. Click on the cog icon to open Settings dialog.
+4. Enter alias and update settings to fit your usage.
 5. Create or update existing client
 6. Go to Advanced tab and Select above authentication flow in the section `Authentication flow overrides`
 
@@ -41,7 +43,7 @@ Features:
 1. Add SMS or Email OTP as a new step in the authentication flow.
 2. Select `Requirement` as `Require`
 3. Click on the cog icon to open Settings dialog.
-4. Enter alias.
+4. Enter alias and update settings to fit your usage.
 5. SenderId: enter sender id to use as SMS sender.
 5. Optional: turn on simulation mode to print the OTP code to console log instead of send SMS.
 6. Optional: enter email in `Simulation email` to receive email with OTP code in simulation code.
