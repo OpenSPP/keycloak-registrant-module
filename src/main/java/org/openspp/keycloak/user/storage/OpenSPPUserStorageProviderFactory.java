@@ -3,6 +3,8 @@ package org.openspp.keycloak.user.storage;
 import java.util.HashMap;
 import java.util.List;
 import java.util.Map;
+import static java.util.concurrent.TimeUnit.MINUTES;
+import static java.util.concurrent.TimeUnit.SECONDS;
 
 import org.keycloak.Config;
 import org.keycloak.component.ComponentModel;
@@ -46,11 +48,19 @@ public class OpenSPPUserStorageProviderFactory implements UserStorageProviderFac
     private synchronized ProviderConfig configure(ComponentModel model) {
         log.info("Creating configuration for model: id={} name={}", model.getId(), model.getName());
         ProviderConfig providerConfig = new ProviderConfig();
-        String user = model.get("user");
-        String password = model.get("password");
-        String url = model.get("url");
         JDBC jdbc = JDBC.getByDescription(JDBC.POSTGRESQL.getDesc());
-        providerConfig.dataSourceProvider.configure(url, jdbc, user, password, model.getName());
+        providerConfig.dataSourceProvider.configure(
+            model.get("url"),
+            jdbc,
+            model.get("user"),
+            model.get("password"),
+            model.getName(),
+            model.get("minIdle", 5),
+            model.get("poolSize", 50),
+            model.get("connectionTimeout", SECONDS.toMillis(30)),
+            model.get("idleTimeout", MINUTES.toMillis(10)),
+            model.get("lifeTime", MINUTES.toMillis(30))
+        );
         providerConfig.queryConfigurations = new QueryConfigurations(
                 Query.getCount(),
                 Query.getListAll(),
@@ -111,6 +121,46 @@ public class OpenSPPUserStorageProviderFactory implements UserStorageProviderFac
                 .helpText("JDBC Connection Password")
                 .type(ProviderConfigProperty.PASSWORD)
                 .defaultValue("odoopassword")
+                .add();
+
+        pcBuilder.property()
+                .name("minIdle")
+                .label("Minimum Idle Connections")
+                .helpText("The property controls the minimum number of idle connections that HikariCP tries to maintain in the pool, including both idle and in-use connections.")
+                .type(ProviderConfigProperty.STRING_TYPE)
+                .defaultValue(5)
+                .add();
+
+        pcBuilder.property()
+                .name("poolSize")
+                .label("Max Pool Size")
+                .helpText("The property controls the maximum number of connections that HikariCP will keep in the pool, including both idle and in-use connections.")
+                .type(ProviderConfigProperty.STRING_TYPE)
+                .defaultValue(50)
+                .add();
+
+        pcBuilder.property()
+                .name("connectionTimeout")
+                .label("Connection Timeout")
+                .helpText("The maximum number of milliseconds that a client will wait for a connection from the pool.")
+                .type(ProviderConfigProperty.STRING_TYPE)
+                .defaultValue(SECONDS.toMillis(30))
+                .add();
+
+        pcBuilder.property()
+                .name("idleTimeout")
+                .label("Idle Timeout")
+                .helpText("This property controls the maximum amount of time (in milliseconds) that a connection is allowed to sit idle in the pool.")
+                .type(ProviderConfigProperty.STRING_TYPE)
+                .defaultValue(MINUTES.toMillis(10))
+                .add();
+
+        pcBuilder.property()
+                .name("lifeTime")
+                .label("Max Lifetime")
+                .helpText("This property controls the maximum lifetime of a connection in the pool.")
+                .type(ProviderConfigProperty.STRING_TYPE)
+                .defaultValue(MINUTES.toMillis(30))
                 .add();
 
         return pcBuilder.build();
