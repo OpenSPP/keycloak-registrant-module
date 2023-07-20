@@ -155,7 +155,14 @@ public class UserRepository {
     }
 
     public List<Map<String, String>> findUsersByBeneficiaryForm(String householdNumber, String uidNumber, String phoneNumber) {
-        return doQuery(queryConfigurations.getFindByBeneficiaryForm(), this::readMap, householdNumber, uidNumber, phoneNumber);
+        List<Map<String, String>> users = doQuery(queryConfigurations.getFindByUsername(), this::readMap, householdNumber);
+        List<Map<String, String>> groups = doQuery(queryConfigurations.getFindByBeneficiaryForm(), this::readMap, uidNumber, phoneNumber);
+        if (users != null && groups != null) {
+            users.addAll(groups);
+            return users;
+        } else {
+            return users != null && users.size() > 0 ? users : groups;
+        }
     }
 
     public List<Map<String, String>> findUsers(String search, Paginator.Pageable pageable) {

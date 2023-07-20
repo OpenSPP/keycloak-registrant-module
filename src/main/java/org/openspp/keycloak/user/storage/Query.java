@@ -85,14 +85,11 @@ public class Query {
                 group_membership_is_ended
             FROM %s
             WHERE
-                \"username\" = ? OR
-                (
-                    \"group_membership_is_ended\" = false AND
-                    \"group_membership_kind_name\" = 'Head' AND
-                    \"id_type_name\" = 'Unified ID' AND
-                    \"id_type_value\" = ? AND
-                    \"phone\" = ?
-                )
+                \"group_membership_is_ended\" = false AND
+                \"group_membership_kind_name\" = 'Head' AND
+                \"id_type_name\" = 'Unified ID' AND
+                \"id_type_value\" = ? AND
+                \"phone\" = ?
         """;
         return String.format(query, DATABASE);
     }
