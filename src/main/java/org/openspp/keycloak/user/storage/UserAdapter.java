@@ -141,7 +141,8 @@ public class UserAdapter extends AbstractUserAdapterFederatedStorage {
     }
 
     public boolean isGroup() {
-        return getFirstAttribute(IS_GROUP_ATTRIBUTE).equals("t");
+        String isGroupAttr = getFirstAttribute(IS_GROUP_ATTRIBUTE);
+        return isGroupAttr != null && isGroupAttr.equals("t");
     }
 
     public String getActiveGroup() {

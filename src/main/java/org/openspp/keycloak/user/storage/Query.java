@@ -57,7 +57,13 @@ public class Query {
                 first_name,
                 last_name,
                 full_name,
-                active_group
+                is_group,
+                active_group,
+                kind_name,
+                id_type_name,
+                id_type_value,
+                group_membership_kind_name,
+                group_membership_is_ended
             FROM %s
             WHERE
                 \"username\" = ?
@@ -85,14 +91,11 @@ public class Query {
                 group_membership_is_ended
             FROM %s
             WHERE
-                \"username\" = ? OR
-                (
-                    \"group_membership_is_ended\" = false AND
-                    \"group_membership_kind_name\" = 'Head' AND
-                    \"id_type_name\" = 'Unified ID' AND
-                    \"id_type_value\" = ? AND
-                    \"phone\" = ?
-                )
+                \"group_membership_is_ended\" = false AND
+                \"group_membership_kind_name\" = 'Head' AND
+                \"id_type_name\" = 'Unified ID' AND
+                \"id_type_value\" = ? AND
+                \"phone\" = ?
         """;
         return String.format(query, DATABASE);
     }
