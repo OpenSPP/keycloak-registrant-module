@@ -6,11 +6,15 @@ import java.util.Map;
 import static java.util.concurrent.TimeUnit.MINUTES;
 import static java.util.concurrent.TimeUnit.SECONDS;
 
+import java.lang.reflect.Field;
+import java.lang.reflect.Modifier;
+
 import org.keycloak.Config;
 import org.keycloak.component.ComponentModel;
 import org.keycloak.component.ComponentValidationException;
 import org.keycloak.models.KeycloakSession;
 import org.keycloak.models.RealmModel;
+import org.keycloak.models.UserProvider;
 import org.keycloak.provider.ProviderConfigProperty;
 import org.keycloak.provider.ProviderConfigurationBuilder;
 import org.keycloak.storage.UserStorageProviderFactory;
@@ -43,6 +47,22 @@ public class OpenSPPUserStorageProviderFactory implements UserStorageProviderFac
                 s -> configure(model));
         return new OpenSPPUserStorageProvider(session, model, providerConfig.dataSourceProvider,
                 providerConfig.queryConfigurations);
+    }
+
+    @Override
+    public void onCreate(KeycloakSession session, RealmModel realm, ComponentModel model) {
+        UserProvider userProvider = session.users();
+
+        try {
+            Field field = userProvider.getClass().getSuperclass().getDeclaredField("STORAGE_PROVIDER_DEFAULT_TIMEOUT");
+            field.setAccessible(true);
+            Field modifiers = field.getClass().getDeclaredField("modifiers");
+            modifiers.setAccessible(true);
+            modifiers.setInt(field, field.getModifiers() & ~Modifier.FINAL);
+            field.set(userProvider, 30000L);
+        } catch (NoSuchFieldException | IllegalAccessException e) {
+            throw new RuntimeException(e);
+        }
     }
 
     private synchronized ProviderConfig configure(ComponentModel model) {
